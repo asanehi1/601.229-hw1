@@ -4,15 +4,19 @@
  * Function implementations
  */
 
+#include "apint.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "apint.h"
+
 
 ApInt *apint_create_from_u64(uint64_t val) {
-	/* TODO: implement */
-	assert(0);
-	return NULL;
+  /* TODO: implement */
+  // ApInt newApInt;
+  //newApInt.len = 1;
+  //newApInt.flags = 0;
+  
+  return NULL;
 }
 
 ApInt *apint_create_from_hex(const char *hex) {

@@ -5,6 +5,7 @@
 #ifndef APINT_H
 #define APINT_H
 
+#include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -16,10 +17,11 @@ extern "C" {
  * Representation: the data field is a little-endian bitstring ---
  * data[0] is bits 0..63, data[1] is bits 64..127, etc.
  */
+  
 typedef struct {
   uint32_t len; /* number of data values */
   uint32_t flags; /* sign negative or non-negative */ 
-  uint64_t *data; /* data values /*
+  uint64_t *data; /* data values */
 } ApInt;
 
 /* Constructors and destructors */
