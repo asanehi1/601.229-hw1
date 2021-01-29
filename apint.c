@@ -8,15 +8,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+#include <byteswap.h>
 
 ApInt *apint_create_from_u64(uint64_t val) {
   /* TODO: implement */
-  // ApInt newApInt;
-  //newApInt.len = 1;
-  //newApInt.flags = 0;
-  
-  return NULL;
+  ApInt* newApInt = malloc(sizeof(ApInt));
+  newApInt->len = 1;
+  newApInt->flags = 0;
+  newApInt->data = __bswap_64(val);
+  return newApInt;
 }
 
 ApInt *apint_create_from_hex(const char *hex) {
