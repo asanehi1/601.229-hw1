@@ -15,6 +15,7 @@ ApInt *apint_create_from_u64(uint64_t val) {
   ApInt* newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
+  // bswap makes val (in big endian form) into little endian form for data
   newApInt->data = __bswap_64(val);
   return newApInt;
 }
