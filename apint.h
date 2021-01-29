@@ -17,7 +17,9 @@ extern "C" {
  * data[0] is bits 0..63, data[1] is bits 64..127, etc.
  */
 typedef struct {
-	/* TODO: add fields */
+  uint32_t len; /* number of data values */
+  uint32_t flags; /* sign negative or non-negative */ 
+  uint64_t *data; /* data values /*
 } ApInt;
 
 /* Constructors and destructors */
