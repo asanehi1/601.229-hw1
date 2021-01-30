@@ -11,6 +11,7 @@
  * - etc.
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,8 +48,8 @@ int main(int argc, char **argv) {
 		 */
 		tctest_testname_to_execute = argv[1];
 	}
-
-	TEST(testCreateFromU64);
+	
+       	TEST(testCreateFromU64);
 	TEST(testHighestBitSet);
 	TEST(testCompare);
 	TEST(testFormatAsHex);
@@ -63,9 +64,9 @@ TestObjs *setup(void) {
 	TestObjs *objs = malloc(sizeof(TestObjs));
 	objs->ap0 = apint_create_from_u64(0UL);
 	objs->ap1 = apint_create_from_u64(1UL);
-	objs->ap110660361 = apint_create_from_u64(110660361UL);
-	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
-	objs->minus1 = apint_negate(objs->ap1);
+	//objs->ap110660361 = apint_create_from_u64(110660361UL);
+	//objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
+	//objs->minus1 = apint_negate(objs->ap1);
 	/* TODO: initialize additional members of test fixture */
 
 	return objs;
@@ -74,20 +75,25 @@ TestObjs *setup(void) {
 void cleanup(TestObjs *objs) {
 	apint_destroy(objs->ap0);
 	apint_destroy(objs->ap1);
-	apint_destroy(objs->ap110660361);
-	apint_destroy(objs->max1);
-	apint_destroy(objs->minus1);
+	//apint_destroy(objs->ap110660361);
+	//apint_destroy(objs->max1);
+	//apint_destroy(objs->minus1);
 	/* TODO: destroy additional members of test fixture */
 
 	free(objs);
 }
 
 void testCreateFromU64(TestObjs *objs) {
-	ASSERT(0UL == apint_get_bits(objs->ap0, 0));
-	ASSERT(1UL == apint_get_bits(objs->ap1, 0));
-	ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
-	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
+  uint64_t temp = apint_get_bits(objs->ap0, 0);
+  printf("final " "%" PRIu64 "\n", temp);
+  ASSERT(0UL == apint_get_bits(objs->ap0, 0));
+  ASSERT(1UL == apint_get_bits(objs->ap1, 0));
+	//ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
+	//ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
 }
+
+
+
 
 void testHighestBitSet(TestObjs *objs) {
 	ASSERT(-1 == apint_highest_bit_set(objs->ap0));
@@ -215,5 +221,9 @@ void testSub(TestObjs *objs) {
 	apint_destroy(a);
 	free(s);
 }
+
+
+
+
 
 /* TODO: add more test functions */

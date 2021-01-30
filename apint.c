@@ -9,28 +9,32 @@
 #include <string.h>
 #include <assert.h>
 #include <byteswap.h>
+#include <inttypes.h>
+#include <stdio.h>
 
 ApInt *apint_create_from_u64(uint64_t val) {
   /* TODO: implement */
-  ApInt* newApInt = malloc(sizeof(ApInt));
+  // needs help! Values get overwritten 
+  ApInt * newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
+  printf("before %" PRIu64 "\n", val);
   // bswap makes val (in big endian form) into little endian form for data
-  val = __bswap_64(val);
-  newApInt->data =(uint64_t *)&val;
-  
+  val = (__bswap_64(val));
+  newApInt->data = (uint64_t *)&val;
+  printf("after %" PRIu64 "\n", val);
   return newApInt;
 }
 
 ApInt *apint_create_from_hex(const char *hex) {
 	/* TODO: implement */
-	assert(0);
+  uint64_t temp = strtoull(hex, NULL,  64);
 	return NULL;
 }
 
 void apint_destroy(ApInt *ap) {
 	/* TODO: implement */
-	assert(0);
+  free(ap);
 }
 
 int apint_is_zero(const ApInt *ap) {
@@ -47,8 +51,10 @@ int apint_is_negative(const ApInt *ap) {
 
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 	/* TODO: implement */
-	assert(0);
-	return 0UL;
+  // ignore sign
+  // add code for n
+  uint64_t temp = (ap->data[n]);
+  return  __bswap_64(temp);
 }
 
 int apint_highest_bit_set(const ApInt *ap) {
