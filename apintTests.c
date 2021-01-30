@@ -63,7 +63,12 @@ int main(int argc, char **argv) {
 TestObjs *setup(void) {
 	TestObjs *objs = malloc(sizeof(TestObjs));
 	objs->ap0 = apint_create_from_u64(0UL);
+	uint64_t temp = apint_get_bits(objs->ap0, 0);
+	printf("final ap0: " "%" PRIu64 "\n", temp);
+	
 	objs->ap1 = apint_create_from_u64(1UL);
+	uint64_t temp1 = apint_get_bits(objs->ap1, 0);
+	printf("final ap1:" "%" PRIu64 "\n", temp1);
 	//objs->ap110660361 = apint_create_from_u64(110660361UL);
 	//objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
 	//objs->minus1 = apint_negate(objs->ap1);
@@ -87,8 +92,10 @@ void testCreateFromU64(TestObjs *objs) {
   uint64_t temp = apint_get_bits(objs->ap1, 0);
   printf("final " "%" PRIu64 "\n", temp);
   ASSERT(0UL == apint_get_bits(objs->ap0, 0));
+  //printf("");
   ASSERT(1UL == apint_get_bits(objs->ap1, 0));
-	//ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
+  
+  //ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
 	//ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
 }
 

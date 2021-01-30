@@ -15,7 +15,7 @@
 ApInt *apint_create_from_u64(uint64_t val) {
   /* TODO: implement */
   // needs help! Values get overwritten 
-  ApInt * newApInt = malloc(sizeof(ApInt));
+  ApInt * newApInt = malloc(sizeof(ApInt*));
   newApInt->len = 1;
   newApInt->flags = 0;
   printf("before %" PRIu64 "\n", val);
@@ -29,6 +29,8 @@ ApInt *apint_create_from_u64(uint64_t val) {
 ApInt *apint_create_from_hex(const char *hex) {
 	/* TODO: implement */
   uint64_t temp = strtoull(hex, NULL,  64);
+  printf("hex: %s",hex);
+  printf("uint64_t temp: %lu", temp);
 	return NULL;
 }
 
