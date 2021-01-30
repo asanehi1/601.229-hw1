@@ -57,7 +57,7 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 	/* TODO: implement */
   // ignore sign
   // add code for n
-  uint64_t temp = *(ap->data);
+  uint64_t temp = *(uint64_t *)(ap->data);
   return  __bswap_64(temp);
 }
 
