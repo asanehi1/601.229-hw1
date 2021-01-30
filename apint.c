@@ -20,8 +20,8 @@ ApInt *apint_create_from_u64(uint64_t val) {
   newApInt->flags = 0;
   printf("before %" PRIu64 "\n", val);
   // bswap makes val (in big endian form) into little endian form for data
-  val = (__bswap_64(val));
-  newApInt->data = (uint64_t *)&val;
+  // val = (__bswap_64(val));
+  newApInt->data = (uint64_t * )val;
   printf("after %" PRIu64 "\n", val);
   return newApInt;
 }
@@ -57,8 +57,9 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 	/* TODO: implement */
   // ignore sign
   // add code for n
-  uint64_t temp = *(uint64_t *)(ap->data);
-  return  __bswap_64(temp);
+  uint64_t temp = (ap->data);
+  //temp = __bswap_64(temp);
+  return  temp;
 }
 
 int apint_highest_bit_set(const ApInt *ap) {
