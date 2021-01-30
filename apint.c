@@ -37,16 +37,20 @@ void apint_destroy(ApInt *ap) {
   free(ap);
 }
 
+/* Returns 1 if the ApInt instance whose address is passed is numerically equal to 0, and returns 0 if the ApInt has a non-zero value (positive or negative */
 int apint_is_zero(const ApInt *ap) {
-	/* TODO: implement */
-	assert(0);
-	return 0;
+  if (ap->data != 0){
+    return 0;
+  }
+  return 1;
 }
 
+/* Returns 1 if the ApInt instance whose address is passed is negative (numerically less than 0), and returns 0 otherwise (if the ApInt is non-negative) */
 int apint_is_negative(const ApInt *ap) {
-	/* TODO: implement */
-	assert(0);
-	return 0;
+  if (ap->data < 0) {
+    return 1;
+  }
+  return 0;
 }
 
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
@@ -70,9 +74,16 @@ char *apint_format_as_hex(const ApInt *ap) {
 }
 
 ApInt *apint_negate(const ApInt *ap) {
-	/* TODO: implement */
-	assert(0);
-	return NULL;
+  ApInt *newApInt = malloc(sizeof(ApInt));
+  if (ap->data == 0) {
+    newApInt->data = 0;
+    return newApInt;
+  } else if(ap->flags == 0) {
+    newApInt->flags = 1;
+  } else {
+    newApInt->flags = 0;
+  }
+  return newApInt;
 }
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
