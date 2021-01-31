@@ -18,11 +18,11 @@ ApInt *apint_create_from_u64(uint64_t val) {
   ApInt * newApInt = malloc(sizeof(ApInt*));
   newApInt->len = 1;
   newApInt->flags = 0;
-  printf("before %" PRIu64 "\n", val);
+  // printf("before %" PRIu64 "\n", val);
   // bswap makes val (in big endian form) into little endian form for data
-  val = (__bswap_64(val));
-  newApInt->data = (uint64_t *)&val;
-  printf("after %" PRIu64 "\n", val);
+  // val = (__bswap_64(val));
+  newApInt->data = (uint64_t * )val;
+  //printf("after %" PRIu64 "\n", val);
   return newApInt;
 }
 
@@ -59,14 +59,25 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 	/* TODO: implement */
   // ignore sign
   // add code for n
-  uint64_t temp = *(uint64_t *)(ap->data);
-  return  __bswap_64(temp);
+  uint64_t temp = (uint64_t) (ap->data);
+  //temp = __bswap_64(temp);
+  return  temp;
 }
 
 int apint_highest_bit_set(const ApInt *ap) {
 	/* TODO: implement */
-	assert(0);
-	return -1;
+  uint64_t temp = (uint64_t) ap->data;
+  if (temp == 0) {
+    return -1;
+  }
+  int highestBit = 0;
+  for (int i = 0; i < (int) ap->len * 64; i++) {
+    if (temp & 0x01) {
+      highestBit = i;
+    }
+    temp = temp >> 1;
+  }
+  return highestBit;
 }
 
 char *apint_format_as_hex(const ApInt *ap) {
