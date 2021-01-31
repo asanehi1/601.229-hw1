@@ -14,7 +14,7 @@
 
 ApInt *apint_create_from_u64(uint64_t val) {
   /* TODO: implement */
-  // needs help! Values get overwritten 
+  // needs help! Values get overwritten
   ApInt * newApInt = malloc(sizeof(ApInt*));
   newApInt->len = 1;
   newApInt->flags = 0;
@@ -50,7 +50,7 @@ int apint_is_zero(const ApInt *ap) {
 
 /* Returns 1 if the ApInt instance whose address is passed is negative (numerically less than 0), and returns 0 otherwise (if the ApInt is non-negative) */
 int apint_is_negative(const ApInt *ap) {
-  if (ap->data < 0) {
+  if (ap->flags == 1) {
     return 1;
   }
   return 0;
@@ -170,8 +170,9 @@ char *apint_format_as_hex(const ApInt *ap) {
 
 ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = malloc(sizeof(ApInt));
+  newApInt->len = ap->len;
+  newApInt->data = ap->data;
   if (ap->data == 0) {
-    newApInt->data = 0;
     return newApInt;
   } else if(ap->flags == 0) {
     newApInt->flags = 1;
@@ -220,6 +221,15 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
 
 int apint_compare(const ApInt *left, const ApInt *right) {
 	/* TODO: implement */
-	assert(0);
-	return 0;
+  if (left->data == right->data && left->flags == right->flags) {
+    return 0;
+  } else if (left->data < right->data && right->flags == 0) {
+    return -1;
+  } else if (right->data < left->data && left->flags == 0) {
+    return 1;
+  } else if (left->data >= right->data && left->flags == 1) {
+    return -1;
+  } else {
+    return 1;
+  }
 }
