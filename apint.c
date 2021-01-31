@@ -81,10 +81,91 @@ int apint_highest_bit_set(const ApInt *ap) {
   return highestBit;
 }
 
+char get_hex_char(int num) {
+  switch(num) {
+  case 1: return '1'; break;
+  case 2: return '2'; break;
+  case 3: return '3'; break;
+  case 4: return '4'; break;
+  case 5: return '5'; break;
+  case 6: return '6'; break;
+  case 7: return '7'; break;
+  case 8: return '8'; break;
+  case 9: return '9'; break;
+  case 10: return 'a'; break;
+  case 11: return 'b'; break;
+  case 12: return 'c'; break;
+  case 13: return 'd'; break;
+  case 14: return 'e'; break;
+  default: return 'f'; break;
+  }
+}
+
+int apint_to_hex_calculations(int pos) {
+  switch(pos) {
+  case 0: return 1; break;
+  case 1: return 2; break;
+  case 2: return 4; break;
+  default: return 8; break;
+  }
+}
+
 char *apint_format_as_hex(const ApInt *ap) {
 	/* TODO: implement */
-	assert(0);
-	return NULL;
+
+  printf("f1\n");
+  char* hex = NULL;
+  printf("f2\n");
+  uint64_t temp = (uint64_t*)ap->data;
+  int j = 0;
+  int sum = 0;
+  for (int i = 0, k = 0; i < (int) ap->len * 64; i++) {
+    printf("f3 bit index: %d \n",i );
+    printf("before sum: %d \n", sum);
+    if(j < 4) {
+      printf("f4\n");
+      if(temp == 1) {
+	printf("f5\n");
+	sum =sum + apint_to_hex_calculations(j);
+	printf("new sum: %d \n", sum);
+      }
+      printf("f6\n");
+
+      if (j == 3) {
+	printf("f7\n");
+	printf("sum: %d \n", sum);
+	//if(sum > 9) {
+	  printf("f8\n");
+	  hex[k++] = get_hex_char(sum);
+	  printf("f9\n");
+	 
+	  //}
+	//hex[k++] = sum;
+	printf("f10\n");
+
+	j = 0; sum = 0;
+      } else { j++;}
+      
+    }
+    printf("f11\n");
+    if (i + 1 == (int) ap->len*64) {
+      printf("f12\n");
+      //if(sum > 9) {
+	printf("f13\n");
+	hex[k++] = get_hex_char(sum);
+	printf("f14\n");
+	
+	//}
+      //      hex[k] = sum;
+      // printf("f15\n");
+      
+    }
+    temp = temp >> 1;
+    printf("f16a");
+  }
+  
+  
+  return hex;
 }
 
 ApInt *apint_negate(const ApInt *ap) {
@@ -105,22 +186,36 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   uint64_t temp = (uint64_t)a->data;
   uint64_t temp1 = (uint64_t)b->data;
   uint64_t result = temp + temp1;
+
+  //for testing
   printf("a %" PRIu64 "\n", temp);
   printf("b %" PRIu64 "\n", temp1);
   printf("a+b %" PRIu64 "\n", result);
+
   ApInt * newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
   newApInt->data = (uint64_t*)result;
-  assert(0);
   return newApInt;
 }
 
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
 	/* TODO: implement */
-	assert(0);
-	return NULL;
+  uint64_t temp = (uint64_t)a->data;
+  uint64_t temp1 = (uint64_t)b->data;
+  uint64_t result = temp - temp1;
+
+  //for testing
+  printf("a %" PRIu64 "\n", temp);
+  printf("b %" PRIu64 "\n", temp1);
+  printf("a-b %" PRIu64 "\n", result);
+
+  ApInt * newApInt = malloc(sizeof(ApInt));
+  newApInt->len = 1;
+  newApInt->flags = 0;
+  newApInt->data = (uint64_t*)result;
+  return newApInt;
 }
 
 int apint_compare(const ApInt *left, const ApInt *right) {

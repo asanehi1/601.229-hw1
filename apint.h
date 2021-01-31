@@ -28,7 +28,7 @@ typedef struct {
 ApInt *apint_create_from_u64(uint64_t val);
 ApInt *apint_create_from_hex(const char *hex);
 void apint_destroy(ApInt *ap);
-
+  
 /* Operations */
 int apint_is_zero(const ApInt *ap);
 int apint_is_negative(const ApInt *ap);
@@ -39,7 +39,8 @@ ApInt *apint_negate(const ApInt *ap);
 ApInt *apint_add(const ApInt *a, const ApInt *b);
 ApInt *apint_sub(const ApInt *a, const ApInt *b);
 int apint_compare(const ApInt *left, const ApInt *right);
-
+  char get_hex_char(int num);
+  int apint_to_hex_calculations(int pos);
   int unsigned_add(const ApInt* a, const ApInt *b);
   int unsigned_sub(const ApInt* a, const ApInt *b);
   
