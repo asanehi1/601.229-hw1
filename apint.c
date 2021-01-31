@@ -184,22 +184,25 @@ ApInt *apint_negate(const ApInt *ap) {
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   /* TODO: implement */
-  uint64_t temp = (uint64_t)a->data;
-  uint64_t temp1 = (uint64_t)b->data;
+  //uint64_t temp = (uint64_t)a->data;
+  //uint64_t temp1 = (uint64_t)b->data;
+  uint64_t temp = a->data[0];
+  uint64_t temp1 = b->data[0];
+
   uint64_t result = temp + temp1;
 
   //for testing
-  //printf("\na %" PRIu64 "\n", temp);
-  //printf("b %" PRIu64 "\n", temp1);
-  //printf("a+b %" PRIu64 "\n", result);
+  printf("\na %" PRIu64 "\n", temp);
+  printf("b %" PRIu64 "\n", temp1);
+  printf("a+b %" PRIu64 "\n", result);
 
   ApInt * newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
-  newApInt->data = (uint64_t*)result;
+  newApInt->data =(uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->data =(uint64_t*)result;
   return newApInt;
 }
-
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
 	/* TODO: implement */
