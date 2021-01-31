@@ -1,3 +1,4 @@
+
 /*
  * Unit tests for arbitrary-precision integer data type
  *
@@ -67,15 +68,13 @@ TestObjs *setup(void) {
 	printf("final ap0: " "%" PRIu64 "\n", temp);
 	
 	objs->ap1 = apint_create_from_u64(1UL);
-<<<<<<< HEAD
 	uint64_t temp1 = apint_get_bits(objs->ap1, 0);
 	printf("final ap1:" "%" PRIu64 "\n", temp1);
 	//objs->ap110660361 = apint_create_from_u64(110660361UL);
 	//objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
-=======
 	objs->ap110660361 = apint_create_from_u64(110660361UL);
 	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
->>>>>>> e2f7dbd431d4d59b9b229f80d2ce54751593a97d
+
 	//objs->minus1 = apint_negate(objs->ap1);
 	/* TODO: initialize additional members of test fixture */
 
@@ -99,14 +98,11 @@ void testCreateFromU64(TestObjs *objs) {
   ASSERT(0UL == apint_get_bits(objs->ap0, 0));
   //printf("");
   ASSERT(1UL == apint_get_bits(objs->ap1, 0));
-<<<<<<< HEAD
   
   //ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
 	//ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
-=======
   ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
   ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
->>>>>>> e2f7dbd431d4d59b9b229f80d2ce54751593a97d
 }
 
 
@@ -161,7 +157,7 @@ void testAdd(TestObjs *objs) {
 	free(s);
 
 	/* 1 + 0 = 1 */
-	sum = apint_add(objs->ap1, objs->ap0);
+       	sum = apint_add(objs->ap1, objs->ap0);
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);

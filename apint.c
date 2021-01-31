@@ -29,9 +29,10 @@ ApInt *apint_create_from_u64(uint64_t val) {
 ApInt *apint_create_from_hex(const char *hex) {
 	/* TODO: implement */
   uint64_t temp = strtoull(hex, NULL,  64);
-  printf("hex: %s",hex);
-  printf("uint64_t temp: %lu", temp);
-	return NULL;
+  //printf("hex: %s",hex);
+  //printf("uint64_t temp: %lu", temp);
+
+  return apint_create_from_u64(temp);
 }
 
 void apint_destroy(ApInt *ap) {
@@ -100,9 +101,19 @@ ApInt *apint_negate(const ApInt *ap) {
 }
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
-	/* TODO: implement */
-	assert(0);
-	return NULL;
+  /* TODO: implement */
+  uint64_t temp = (uint64_t)a->data;
+  uint64_t temp1 = (uint64_t)b->data;
+  uint64_t result = temp + temp1;
+  printf("a %" PRIu64 "\n", temp);
+  printf("b %" PRIu64 "\n", temp1);
+  printf("a+b %" PRIu64 "\n", result);
+  ApInt * newApInt = malloc(sizeof(ApInt));
+  newApInt->len = 1;
+  newApInt->flags = 0;
+  newApInt->data = (uint64_t*)result;
+  assert(0);
+  return newApInt;
 }
 
 
