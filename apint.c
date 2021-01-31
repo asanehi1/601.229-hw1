@@ -189,9 +189,9 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   uint64_t result = temp + temp1;
 
   //for testing
-  printf("a %" PRIu64 "\n", temp);
-  printf("b %" PRIu64 "\n", temp1);
-  printf("a+b %" PRIu64 "\n", result);
+  //printf("\na %" PRIu64 "\n", temp);
+  //printf("b %" PRIu64 "\n", temp1);
+  //printf("a+b %" PRIu64 "\n", result);
 
   ApInt * newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
@@ -208,9 +208,9 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   uint64_t result = temp - temp1;
 
   //for testing
-  printf("a %" PRIu64 "\n", temp);
-  printf("b %" PRIu64 "\n", temp1);
-  printf("a-b %" PRIu64 "\n", result);
+  //printf("\na %" PRIu64 "\n", temp);
+  //printf("b %" PRIu64 "\n", temp1);
+  //printf("a-b %" PRIu64 "\n", result);
 
   ApInt * newApInt = malloc(sizeof(ApInt));
   newApInt->len = 1;
