@@ -15,13 +15,17 @@
 ApInt *apint_create_from_u64(uint64_t val) {
   /* TODO: implement */
   // needs help! Values get overwritten
-  ApInt * newApInt = malloc(sizeof(ApInt*));
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
-  // printf("before %" PRIu64 "\n", val);
+  //printf("before %" PRIu64 "\n", val);
   // bswap makes val (in big endian form) into little endian form for data
   // val = (__bswap_64(val));
-  newApInt->data = (uint64_t * )val;
+  //newApInt->data = (uint64_t * )val;
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+ 
+  newApInt->data[0] = val;
+
   //printf("after %" PRIu64 "\n", val);
   return newApInt;
 }
@@ -42,7 +46,7 @@ void apint_destroy(ApInt *ap) {
 
 /* Returns 1 if the ApInt instance whose address is passed is numerically equal to 0, and returns 0 if the ApInt has a non-zero value (positive or negative */
 int apint_is_zero(const ApInt *ap) {
-  if (ap->data != 0){
+  if (ap->data[0] != 0){
     return 0;
   }
   return 1;
@@ -60,14 +64,15 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 	/* TODO: implement */
   // ignore sign
   // add code for n
-  uint64_t temp = (uint64_t) (ap->data);
+  //uint64_t temp = (uint64_t) (ap->data);
+   uint64_t temp = ap->data[n];
   //temp = __bswap_64(temp);
   return  temp;
 }
 
 int apint_highest_bit_set(const ApInt *ap) {
 	/* TODO: implement */
-  uint64_t temp = (uint64_t) ap->data;
+  uint64_t temp = ap->data[0];
   if (temp == 0) {
     return -1;
   }
@@ -169,10 +174,11 @@ char *apint_format_as_hex(const ApInt *ap) {
 }
 
 ApInt *apint_negate(const ApInt *ap) {
-  ApInt *newApInt = malloc(sizeof(ApInt));
+  ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
-  newApInt->data = ap->data;
-  if (ap->data == 0) {
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->data[0] = ap->data[0];
+  if (ap->data[0] == 0) {
     return newApInt;
   } else if(ap->flags == 0) {
     newApInt->flags = 1;
@@ -196,41 +202,43 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   printf("b %" PRIu64 "\n", temp1);
   printf("a+b %" PRIu64 "\n", result);
 
-  ApInt * newApInt = malloc(sizeof(ApInt));
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
-  newApInt->data =(uint64_t*)malloc(sizeof(uint64_t));
-  newApInt->data =(uint64_t*)result;
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->data[0] = result;
   return newApInt;
 }
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
 	/* TODO: implement */
-  uint64_t temp = (uint64_t)a->data;
-  uint64_t temp1 = (uint64_t)b->data;
+ uint64_t temp = a->data[0];
+  uint64_t temp1 = b->data[0];
+
   uint64_t result = temp - temp1;
 
   //for testing
-  //printf("\na %" PRIu64 "\n", temp);
-  //printf("b %" PRIu64 "\n", temp1);
-  //printf("a-b %" PRIu64 "\n", result);
+  printf("\na %" PRIu64 "\n", temp);
+  printf("b %" PRIu64 "\n", temp1);
+  printf("a+b %" PRIu64 "\n", result);
 
-  ApInt * newApInt = malloc(sizeof(ApInt));
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
-  newApInt->data = (uint64_t*)result;
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->data[0] = result;
   return newApInt;
 }
 
 int apint_compare(const ApInt *left, const ApInt *right) {
 	/* TODO: implement */
-  if (left->data == right->data && left->flags == right->flags) {
+  if (left->data[0] == right->data[0] && left->flags == right->flags) {
     return 0;
-  } else if (left->data < right->data && right->flags == 0) {
+  } else if (left->data[0] < right->data[0] && right->flags == 0) {
     return -1;
-  } else if (right->data < left->data && left->flags == 0) {
+  } else if (right->data[0] < left->data[0] && left->flags == 0) {
     return 1;
-  } else if (left->data >= right->data && left->flags == 1) {
+  } else if (left->data[0] >= right->data[0] && left->flags == 1) {
     return -1;
   } else {
     return 1;
