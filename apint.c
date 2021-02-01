@@ -13,8 +13,6 @@
 #include <stdio.h>
 
 ApInt *apint_create_from_u64(uint64_t val) {
-  /* TODO: implement */
-  // needs help! Values get overwritten
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
   newApInt->flags = 0;
@@ -22,6 +20,7 @@ ApInt *apint_create_from_u64(uint64_t val) {
   // bswap makes val (in big endian form) into little endian form for data
   // val = (__bswap_64(val));
   //newApInt->data = (uint64_t * )val;
+  
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
  
   newApInt->data[0] = val;
@@ -39,12 +38,14 @@ ApInt *apint_create_from_hex(const char *hex) {
   return apint_create_from_u64(temp);
 }
 
+/* Deallocates the memory used by the ApInt instance pointed-to by the ap parameter */
 void apint_destroy(ApInt *ap) {
-	/* TODO: implement */
+  free(ap->data);
   free(ap);
 }
 
-/* Returns 1 if the ApInt instance whose address is passed is numerically equal to 0, and returns 0 if the ApInt has a non-zero value (positive or negative */
+/* Returns 1 if the ApInt instance whose address is passed is numerically equal to 0
+ returns 0 if the ApInt has a non-zero value (positive or negative */
 int apint_is_zero(const ApInt *ap) {
   if (ap->data[0] != 0){
     return 0;
@@ -52,7 +53,8 @@ int apint_is_zero(const ApInt *ap) {
   return 1;
 }
 
-/* Returns 1 if the ApInt instance whose address is passed is negative (numerically less than 0), and returns 0 otherwise (if the ApInt is non-negative) */
+/* Returns 1 if the ApInt instance whose address is passed is negative (numerically less than 0)
+ returns 0 otherwise (if the ApInt is non-negative) */
 int apint_is_negative(const ApInt *ap) {
   if (ap->flags == 1) {
     return 1;
@@ -61,26 +63,23 @@ int apint_is_negative(const ApInt *ap) {
 }
 
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
-	/* TODO: implement */
   // ignore sign
-  // add code for n
-  //uint64_t temp = (uint64_t) (ap->data);
    uint64_t temp = ap->data[n];
-  //temp = __bswap_64(temp);
   return  temp;
 }
 
 int apint_highest_bit_set(const ApInt *ap) {
-	/* TODO: implement */
   uint64_t temp = ap->data[0];
   if (temp == 0) {
     return -1;
   }
   int highestBit = 0;
   for (int i = 0; i < (int) ap->len * 64; i++) {
-    if (temp & 0x01) {
+    // if bit == 1
+    if (temp & 1) {
       highestBit = i;
     }
+    // shift 
     temp = temp >> 1;
   }
   return highestBit;
@@ -185,6 +184,7 @@ ApInt *apint_negate(const ApInt *ap) {
   } else {
     newApInt->flags = 0;
   }
+  // apint_destroy(ap);
   return newApInt;
 }
 

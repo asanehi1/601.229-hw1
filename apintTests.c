@@ -57,9 +57,9 @@ int main(int argc, char **argv) {
        	TEST(testCreateFromU64);
 	TEST(testHighestBitSet);
 	TEST(testCompare);
-	TEST(testFormatAsHex);
-	TEST(testAdd);
-	TEST(testSub);
+	//	TEST(testFormatAsHex);
+	//TEST(testAdd);
+	//TEST(testSub);
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
