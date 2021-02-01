@@ -41,8 +41,8 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b);
 int apint_compare(const ApInt *left, const ApInt *right);
   char get_hex_char(int num);
   int apint_to_hex_calculations(int pos);
-  int unsigned_add(const ApInt* a, const ApInt *b);
-  int unsigned_sub(const ApInt* a, const ApInt *b);
+  uint64_t unsigned_add(const uint64_t a, const uint64_t b);
+  uint64_t unsigned_sub(const uint64_t a, const uint64_t b);
   
 #ifdef __cplusplus
 }

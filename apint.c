@@ -188,24 +188,47 @@ ApInt *apint_negate(const ApInt *ap) {
   return newApInt;
 }
 
+uint64_t unsigned_add(const uint64_t a, const uint64_t b) {
+  return a + b;
+}
+
+uint64_t unsigned_sub(const uint64_t a, const uint64_t b) {
+  return a - b;
+}
+
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
-  /* TODO: implement */
-  //uint64_t temp = (uint64_t)a->data;
-  //uint64_t temp1 = (uint64_t)b->data;
-  uint64_t temp = a->data[0];
-  uint64_t temp1 = b->data[0];
-
-  uint64_t result = temp + temp1;
-
-  //for testing
-  printf("\na %" PRIu64 "\n", temp);
-  printf("b %" PRIu64 "\n", temp1);
-  printf("a+b %" PRIu64 "\n", result);
+  uint64_t result;
 
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
-  newApInt->len = 1;
-  newApInt->flags = 0;
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->len = 1;
+
+  if(a->flags == 0 && b->flags == 0) {
+    result = unsigned_add(a->data[0], b->data[0]);
+    newApInt->flags = 0;
+  } else if (a->flags == 1 && b->flags == 1) {
+    result = unsigned_add(a->data[0], b->data[0]);
+    newApInt->flags = 1;
+  } else if (apint_compare(a,b) == 1 && (a->flags == 0 && b->flags == 1)) {
+    result = unsigned_sub(a->data[0], b->data[0]);
+    newApInt->flags = 0;
+  } else if (apint_compare(a,b) == -1 && (a->flags == 1 && b->flags == 0)) {
+    result = unsigned_sub(b->data[0], a->data[0]);
+    newApInt->flags = 0;
+  }
+
+
+
+  //uint64_t temp = a->data[0];
+  //uint64_t temp1 = b->data[0];
+
+  //uint64_t result = temp + temp1;
+
+  //for testing
+  // printf("\na %" PRIu64 "\n", temp);
+  // printf("b %" PRIu64 "\n", temp1);
+  // printf("a+b %" PRIu64 "\n", result);
+
   newApInt->data[0] = result;
   return newApInt;
 }
@@ -218,9 +241,9 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   uint64_t result = temp - temp1;
 
   //for testing
-  printf("\na %" PRIu64 "\n", temp);
-  printf("b %" PRIu64 "\n", temp1);
-  printf("a+b %" PRIu64 "\n", result);
+  // printf("\na %" PRIu64 "\n", temp);
+  // printf("b %" PRIu64 "\n", temp1);
+  // printf("a+b %" PRIu64 "\n", result);
 
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
