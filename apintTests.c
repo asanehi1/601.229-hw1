@@ -26,7 +26,7 @@ typedef struct {
 	ApInt *max1;
 	ApInt *minus1;
 	/* TODO: add additional fields of test fixture */
-  ApInt *minus110660361;
+        ApInt *minus110660361;
 } TestObjs;
 
 TestObjs *setup(void);
@@ -42,6 +42,7 @@ void testSub(TestObjs *objs);
 
 void testIsNegative(TestObjs *objs);
 void testIsZero(TestObjs *objs);
+void basicAdd(TestObjs *objs);
 
 int main(int argc, char **argv) {
 	TEST_INIT();
@@ -63,27 +64,22 @@ int main(int argc, char **argv) {
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
+	TEST(basicAdd);
 	TEST_FINI();
 }
 
 TestObjs *setup(void) {
 	TestObjs *objs = malloc(sizeof(TestObjs));
-	objs->ap0 = apint_create_from_u64(0UL);
-	uint64_t temp = apint_get_bits(objs->ap0, 0);
-	//printf("final ap0: " "%" PRIu64 "\n", temp);
-	
+	objs->ap0 = apint_create_from_u64(0UL);	
 	objs->ap1 = apint_create_from_u64(1UL);
-	uint64_t temp1 = apint_get_bits(objs->ap1, 0);
-	//printf("final ap1:" "%" PRIu64 "\n", temp1);
-	objs->ap110660361 = apint_create_from_u64(110660361UL);
-	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
 	objs->ap110660361 = apint_create_from_u64(110660361UL);
 	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
 	objs->minus1 = apint_negate(objs->ap1);
 	/* TODO: initialize additional members of test fixture */
 
 	objs->minus110660361 = apint_negate(objs->ap110660361);
-	
+
+ 
 	return objs;
 }
 
@@ -93,6 +89,7 @@ void cleanup(TestObjs *objs) {
   apint_destroy(objs->ap110660361);
   apint_destroy(objs->max1);
   apint_destroy(objs->minus1);
+  apint_destroy(objs->minus110660361);
 	/* TODO: destroy additional members of test fixture */
 
 	free(objs);
@@ -267,6 +264,66 @@ void testIsNegative(TestObjs *objs) {
 }
   
   
+void basicAdd(TestObjs *objs) {
+  	ApInt *sum;
 
+	/* 0 + 0 = 0 */
+	sum = apint_add(objs->ap0, objs->ap0);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+        
+
+	/* 1 + 0 = 1 */
+       	sum = apint_add(objs->ap1, objs->ap0);
+	ASSERT(1 ==  apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+
+	/* 1 + 1 = 2 */
+	sum = apint_add(objs->ap1, objs->ap1);
+	ASSERT(2 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+	
+
+	/* -1 + 1 = 0 */
+	sum = apint_add(objs->minus1, objs->ap1);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+	/* 1 + -1 = 0 */
+	sum = apint_add(objs->ap1, objs->minus1);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+	/* -1 + -1 = -2 */
+	sum = apint_add(objs->minus1, objs->minus1);
+	ASSERT(2 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+	/* -110660361 + -1 = -110660362 */
+	sum = apint_add(objs->minus110660361, objs->minus1);
+	ASSERT(110660362 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+	/* 110660361 + -1 = 110660360 */
+	sum = apint_add(objs->ap110660361, objs->minus1);
+	ASSERT(110660360 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+       	/* -110660361 + 0  = -110660361 */
+	sum = apint_add(objs->minus110660361, objs->ap0);
+	ASSERT(110660361 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+}
 
 /* TODO: add more test functions */

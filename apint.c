@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <byteswap.h>
-#include <inttypes.h>
+// this was included to help test code + print
+//#include <inttypes.h>
 #include <stdio.h>
 
 ApInt *apint_create_from_u64(uint64_t val) {
@@ -17,9 +17,6 @@ ApInt *apint_create_from_u64(uint64_t val) {
   newApInt->len = 1;
   newApInt->flags = 0;
   //printf("before %" PRIu64 "\n", val);
-  // bswap makes val (in big endian form) into little endian form for data
-  // val = (__bswap_64(val));
-  //newApInt->data = (uint64_t * )val;
   
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
  
@@ -68,11 +65,14 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   return  temp;
 }
 
+/* return which digit has highest bit */
 int apint_highest_bit_set(const ApInt *ap) {
   uint64_t temp = ap->data[0];
   if (temp == 0) {
     return -1;
   }
+  // highet bit stores the value of highest bit
+  // + updates when necessary
   int highestBit = 0;
   for (int i = 0; i < (int) ap->len * 64; i++) {
     // if bit == 1
@@ -202,21 +202,35 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
   newApInt->len = 1;
-
-  if(a->flags == 0 && b->flags == 0) {
+  
+  if (a->flags == 0 && b->flags == 0) {
+    // both positive 
     result = unsigned_add(a->data[0], b->data[0]);
     newApInt->flags = 0;
-  } else if (a->flags == 1 && b->flags == 1) {
+  } else if (a -> flags ==  b->flags) {
+    // both are negative 
     result = unsigned_add(a->data[0], b->data[0]);
     newApInt->flags = 1;
-  } else if (apint_compare(a,b) == 1 && (a->flags == 0 && b->flags == 1)) {
-    result = unsigned_sub(a->data[0], b->data[0]);
-    newApInt->flags = 0;
-  } else if (apint_compare(a,b) == -1 && (a->flags == 1 && b->flags == 0)) {
+  } else if (a->data[0] < b->data[0] && a->flags == 1) {
+    // a < b and a is negative and b is positive
     result = unsigned_sub(b->data[0], a->data[0]);
     newApInt->flags = 0;
-  }
-
+  }  else if (a->data[0] < b->data[0]) {
+    // a < b and a is positive while b is neg
+    result = unsigned_sub(b->data[0], a->data[0]);
+    newApInt->flags = 1;
+  } else if (a->data[0] > b->data[0] && a->flags == 1) {
+     // a > b and a is neg  while b is pos
+    result = unsigned_sub(a->data[0], b->data[0]);
+    newApInt->flags = 1;
+  } else {
+    // a > b and a is pos  while b is neg
+    result = unsigned_sub(a->data[0], b->data[0]);
+    newApInt->flags = 0;
+  } 
+  
+    
+    
 
 
   //uint64_t temp = a->data[0];
@@ -253,8 +267,12 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   return newApInt;
 }
 
+/* compare left and right 
+ * return 0 if same 
+ * return 1 if left > right 
+ * return -1 if left < right
+ */
 int apint_compare(const ApInt *left, const ApInt *right) {
-	/* TODO: implement */
   if (left->data[0] == right->data[0] && left->flags == right->flags) {
     return 0;
   } else if (left->data[0] < right->data[0] && right->flags == 0) {
