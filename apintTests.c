@@ -43,6 +43,7 @@ void testSub(TestObjs *objs);
 void testIsNegative(TestObjs *objs);
 void testIsZero(TestObjs *objs);
 void basicAdd(TestObjs *objs);
+void basicSub(TestObjs *objs);
 
 int main(int argc, char **argv) {
 	TEST_INIT();
@@ -65,6 +66,7 @@ int main(int argc, char **argv) {
 	TEST(testIsNegative);
 	TEST(testIsZero);
 	TEST(basicAdd);
+	TEST(basicSub);
 	TEST_FINI();
 }
 
@@ -320,6 +322,68 @@ void basicAdd(TestObjs *objs) {
 
        	/* -110660361 + 0  = -110660361 */
 	sum = apint_add(objs->minus110660361, objs->ap0);
+	ASSERT(110660361 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+}
+
+void basicSub(TestObjs *objs) {
+  	ApInt *sum;
+
+	/* 0 - 0 = 0 */
+	sum = apint_sub(objs->ap0, objs->ap0);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+        
+
+	/* 1 - 0 = 1 */
+       	sum = apint_sub(objs->ap1, objs->ap0);
+	ASSERT(1 ==  apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+
+	/* 1 - 1 = 0 */
+	sum = apint_sub(objs->ap1, objs->ap1);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+	
+
+	/* -1 - 1 = -2 */
+	sum = apint_sub(objs->minus1, objs->ap1);
+	ASSERT(2 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+	/* 1 - -1 = 2 */
+	sum = apint_sub(objs->ap1, objs->minus1);
+	ASSERT(2 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+	/* -1 - -1 = 0 */
+	sum = apint_sub(objs->minus1, objs->minus1);
+	ASSERT(0 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+	/* -110660361 - -1 = -110660360 */
+	sum = apint_sub(objs->minus110660361, objs->minus1);
+	ASSERT(110660360 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
+	/* 110660361 - -1 = 110660362 */
+	sum = apint_sub(objs->ap110660361, objs->minus1);
+	ASSERT(110660362 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 0);
+	apint_destroy(sum);
+
+       	/* -110660361 - 0  = -110660361 */
+	sum = apint_sub(objs->minus110660361, objs->ap0);
 	ASSERT(110660361 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);

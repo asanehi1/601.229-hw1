@@ -229,40 +229,46 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
     newApInt->flags = 0;
   } 
   
-    
-    
-
-
-  //uint64_t temp = a->data[0];
-  //uint64_t temp1 = b->data[0];
-
-  //uint64_t result = temp + temp1;
-
-  //for testing
-  // printf("\na %" PRIu64 "\n", temp);
-  // printf("b %" PRIu64 "\n", temp1);
-  // printf("a+b %" PRIu64 "\n", result);
 
   newApInt->data[0] = result;
   return newApInt;
 }
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
-	/* TODO: implement */
- uint64_t temp = a->data[0];
-  uint64_t temp1 = b->data[0];
-
-  uint64_t result = temp - temp1;
-
-  //for testing
-  // printf("\na %" PRIu64 "\n", temp);
-  // printf("b %" PRIu64 "\n", temp1);
-  // printf("a+b %" PRIu64 "\n", result);
+   uint64_t result;
 
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
-  newApInt->len = 1;
-  newApInt->flags = 0;
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  newApInt->len = 1;
+  
+  if (a->data[0] > b->data[0] && a->flags == b->flags) {
+    //a > b  
+    result = unsigned_sub(a->data[0], b->data[0]);
+    // if both positive, sign = positive
+    // if both negative, sign = negative
+    newApInt->flags = a->flags;
+  } else if (a->data[0] > b->data[0]) {
+    // a > b and signs r opposite 
+    result = unsigned_add(a->data[0], b->data[0]);
+    newApInt->flags = a->flags;
+  } else if (a->data[0] < b->data[0] && a->flags == b->flags) {
+    //a < b  
+    result = unsigned_sub(b->data[0], a->data[0]);
+    // opposite sign
+    newApInt->flags = (a->flags + 1) % 2;
+  } else if (a->data[0] < b->data[0]) {
+    // a > b and signs r opposite 
+    result = unsigned_add(a->data[0], b->data[0]);
+    newApInt->flags = a->flags;
+  } else if (apint_compare(a, b) == 0) {
+    result = 0;
+    newApInt->flags = 0;
+  } else {
+    result = a->data[0] * 2;
+    newApInt->flags = a->flags;
+  }
+  
+
   newApInt->data[0] = result;
   return newApInt;
 }
