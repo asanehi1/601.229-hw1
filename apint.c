@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <byteswap.h>
 // this was included to help test code + print
 //#include <inttypes.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@ ApInt *apint_create_from_u64(uint64_t val) {
   
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
  
-  newApInt->data[0] = val;
+  newApInt->data[0] = __bswap_64(val);
 
   //printf("after %" PRIu64 "\n", val);
   return newApInt;
@@ -61,13 +62,13 @@ int apint_is_negative(const ApInt *ap) {
 
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
-   uint64_t temp = ap->data[n];
+  uint64_t temp = __bswap_64(ap->data[n]);
   return  temp;
 }
 
 /* return which digit has highest bit */
 int apint_highest_bit_set(const ApInt *ap) {
-  uint64_t temp = ap->data[0];
+  uint64_t temp = __bswap_64(ap->data[0]);
   if (temp == 0) {
     return -1;
   }
