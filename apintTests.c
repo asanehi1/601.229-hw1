@@ -18,6 +18,7 @@
 #include <string.h>
 #include "apint.h"
 #include "tctest.h"
+#include <inttypes.h>
 
 typedef struct {
 	ApInt *ap0;
@@ -59,7 +60,9 @@ int main(int argc, char **argv) {
        	TEST(testCreateFromU64);
 	TEST(testHighestBitSet);
 	TEST(testCompare);
+	TEST(testFormatAsHex);
 	//TEST(testSub);
+	TEST(testAdd);
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
@@ -163,7 +166,7 @@ void testFormatAsHex(TestObjs *objs) {
 void testAdd(TestObjs *objs) {
 	ApInt *sum;
 	char *s;
-
+	
 	/* 0 + 0 = 0 */
 	sum = apint_add(objs->ap0, objs->ap0);
 	ASSERT(0 == strcmp("0", (s = apint_format_as_hex(sum))));
@@ -172,7 +175,10 @@ void testAdd(TestObjs *objs) {
 
 	/* 1 + 0 = 1 */
        	sum = apint_add(objs->ap1, objs->ap0);
+	//printf("%d \n", (int)  apint_get_bits(sum, 0));
+	//printf("%s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
+
 	apint_destroy(sum);
 	free(s);
 
@@ -181,6 +187,7 @@ void testAdd(TestObjs *objs) {
 	ASSERT(0 == strcmp("2", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);
+	
 
 	/* 110660361 + 1 = 110660362 */
 	sum = apint_add(objs->ap110660361, objs->ap1);
@@ -188,8 +195,20 @@ void testAdd(TestObjs *objs) {
 	apint_destroy(sum);
 	free(s);
 
+	/* FFFFFFFFFFFFFFFF + 0 */
+	sum = apint_add(objs->max1, objs->ap0);
+	printf("%s \n", apint_format_as_hex(sum));
+	ASSERT(0 == strcmp("ffffffffffffffff", (s = apint_format_as_hex(sum))));
+	apint_destroy(sum);
+	free(s);
+	
+
 	/* FFFFFFFFFFFFFFFF + 1 = 10000000000000000 */
 	sum = apint_add(objs->max1, objs->ap1);
+	//printf("%d \n", (int)  apint_get_bits(sum, 0));
+	printf("not hex yet  %" PRIu64 "\n", sum->data[1]);
+	
+	printf("%s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("10000000000000000", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);

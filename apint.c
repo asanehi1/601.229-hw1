@@ -1,3 +1,6 @@
+
+
+
 /*
  * CSF Assignment 1
  * Arbitrary-precision integer data type
@@ -10,7 +13,7 @@
 #include <assert.h>
 #include <byteswap.h>
 // this was included to help test code + print
-//#include <inttypes.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 ApInt *apint_create_from_u64(uint64_t val) {
@@ -90,7 +93,7 @@ int apint_highest_bit_set(const ApInt *ap) {
 
 char get_hex_char(int num) {
   switch(num) {
-    case 0: return '0'; break;
+  case 0: return '0'; break;
   case 1: return '1'; break;
   case 2: return '2'; break;
   case 3: return '3'; break;
@@ -125,6 +128,33 @@ void print_binary(uint64_t w) {
 }
 
 char *apint_format_as_hex(const ApInt *ap) {
+  char* hex = (char*) malloc(sizeof(char) * 17);
+  
+  for (int i = 0; i < (int) ap->len; i++) {
+    uint64_t temp = __bswap_64(ap->data[i]);
+    int remainder = 0;
+    int counter = 0;
+    do {
+      remainder = temp % 16;
+      temp /= 16;
+      hex[counter++] =  get_hex_char(remainder);
+    } while ((int) temp != 0);
+    
+  }
+  
+  printf("%s \n", hex);
+  // swap hex
+  int end = strlen(hex) - 1;
+  int start = 0;
+  while (start < end) {
+    char temp = hex[start];
+    hex[start++] = hex[end];
+    hex[end--] = temp;
+  }
+  printf("%s \n", hex);
+  return hex;
+  
+  /**
   char* hex = (char*)malloc(sizeof(char) * 17);
   int result = 0;
   uint64_t temp = ap->data[0];
@@ -164,6 +194,8 @@ char *apint_format_as_hex(const ApInt *ap) {
   printf("\n %s", hex);
 
   return hex;
+  **/
+  
 }
 
 ApInt *apint_negate(const ApInt *ap) {
@@ -190,7 +222,8 @@ uint64_t unsigned_sub(const uint64_t a, const uint64_t b) {
   return a - b;
 }
 
-ApInt *apint_add(const ApInt *a, const ApInt *b) {
+
+ApInt *apint_add_n(const ApInt *a, const ApInt *b, const int n, const int overflow) {
   uint64_t result;
 
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
@@ -199,34 +232,92 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   
   if (a->flags == 0 && b->flags == 0) {
     // both positive 
-    result = unsigned_add(a->data[0], b->data[0]);
+    result = unsigned_add(a->data[n], b->data[n]);
+    printf("add result  %" PRIu64 "\n", __bswap_64(result));
     newApInt->flags = 0;
   } else if (a -> flags ==  b->flags) {
     // both are negative 
-    result = unsigned_add(a->data[0], b->data[0]);
+    result = unsigned_add(a->data[n], b->data[n]);
     newApInt->flags = 1;
-  } else if (a->data[0] < b->data[0] && a->flags == 1) {
+  } else if (a->data[n] < b->data[n] && a->flags == 1) {
     // a < b and a is negative and b is positive
-    result = unsigned_sub(b->data[0], a->data[0]);
+    result = unsigned_sub(b->data[n], a->data[n]);
     newApInt->flags = 0;
-  }  else if (a->data[0] < b->data[0]) {
+  }  else if (a->data[n] < b->data[n]) {
     // a < b and a is positive while b is neg
-    result = unsigned_sub(b->data[0], a->data[0]);
+    result = unsigned_sub(b->data[n], a->data[n]);
     newApInt->flags = 1;
-  } else if (a->data[0] > b->data[0] && a->flags == 1) {
+  } else if (a->data[n] > b->data[n] && a->flags == 1) {
      // a > b and a is neg  while b is pos
-    result = unsigned_sub(a->data[0], b->data[0]);
+    result = unsigned_sub(a->data[n], b->data[n]);
     newApInt->flags = 1;
   } else {
     // a > b and a is pos  while b is neg
-    result = unsigned_sub(a->data[0], b->data[0]);
+    result = unsigned_sub(a->data[n], b->data[n]);
     newApInt->flags = 0;
   } 
   
 
-  newApInt->data[0] = result;
+  if (overflow == 1) {
+    result ++;
+  }
+   
+   if (result < a->data[n] && a->flags == b->flags) {
+      newApInt->len ++;
+      printf("big number warning \n");
+   } 
+     
+
+  newApInt->data[n] = result;
   return newApInt;
+
+  // if overflows then ap->len ++
+  // can't overflow with subtraction for now?
+ 
 }
+
+
+ApInt *apint_add(const ApInt *a, const ApInt *b) {
+  //return apint_add_n(a, b, 0, 0);
+  
+  uint64_t result;
+  int length;
+
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+
+  // find largest n
+  if (a->len >= b->len) {
+    length = a->len;
+  } else {
+    length = b->len;
+  }
+  int overflow = 0;
+  int tempLength = 1;
+
+  for (int i = 0; i < length; i++) {
+    ApInt * temp = apint_add_n(a, b, i, overflow);
+    newApInt->data[i] = temp->data[i];
+    newApInt->flags = temp->flags; 
+     
+    if ((int) temp->len > tempLength) {
+      overflow = 1;
+      length++;
+      tempLength = temp->len;
+      //newApInt->data[x] = apint_add_n(a, b, x, overflow)->data[x];
+    } else {
+      overflow = 0;
+    }
+  }
+  //newApInt->data[0] = apint_add_n(a, b, 0, 0)->data[0];
+  
+  newApInt->len = tempLength;
+  
+  return newApInt;
+
+ 
+}
+
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
    uint64_t result;
