@@ -63,12 +63,14 @@ int apint_is_negative(const ApInt *ap) {
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
   uint64_t temp = __bswap_64(ap->data[n]);
+  //uint64_t temp = (ap->data[n]);
   return  temp;
 }
 
 /* return which digit has highest bit */
 int apint_highest_bit_set(const ApInt *ap) {
   uint64_t temp = __bswap_64(ap->data[0]);
+  //uint64_t temp = (ap->data[0]);
   if (temp == 0) {
     return -1;
   }
@@ -88,6 +90,7 @@ int apint_highest_bit_set(const ApInt *ap) {
 
 char get_hex_char(int num) {
   switch(num) {
+    case 0: return '0'; break;
   case 1: return '1'; break;
   case 2: return '2'; break;
   case 3: return '3'; break;
@@ -106,70 +109,60 @@ char get_hex_char(int num) {
   }
 }
 
-int apint_to_hex_calculations(int pos) {
-  switch(pos) {
-  case 0: return 1; break;
-  case 1: return 2; break;
-  case 2: return 4; break;
-  default: return 8; break;
+void print_binary(uint64_t w) {
+  for (int i = 0; i < 1 * 64; i++)
+  {
+    if(w & 1) {
+      printf("1");
+    } else {
+      printf("0");
+    }
+
+    w>>=1;
   }
+
+  printf("\n");
 }
 
 char *apint_format_as_hex(const ApInt *ap) {
-	/* TODO: implement */
+  char* hex = (char*)malloc(sizeof(char) * 17);
+  int result = 0;
+  uint64_t temp = ap->data[0];
 
-  printf("f1\n");
-  char* hex = NULL;
-  printf("f2\n");
-  uint64_t temp = (uint64_t*)ap->data;
-  int j = 0;
-  int sum = 0;
-  for (int i = 0, k = 0; i < (int) ap->len * 64; i++) {
-    printf("f3 bit index: %d \n",i );
-    printf("before sum: %d \n", sum);
-    if(j < 4) {
-      printf("f4\n");
-      if(temp == 1) {
-	printf("f5\n");
-	sum =sum + apint_to_hex_calculations(j);
-	printf("new sum: %d \n", sum);
-      }
-      printf("f6\n");
+  //print_binary(temp);
 
-      if (j == 3) {
-	printf("f7\n");
-	printf("sum: %d \n", sum);
-	//if(sum > 9) {
-	  printf("f8\n");
-	  hex[k++] = get_hex_char(sum);
-	  printf("f9\n");
-	 
-	  //}
-	//hex[k++] = sum;
-	printf("f10\n");
+  temp = __bswap_64(temp);
 
-	j = 0; sum = 0;
-      } else { j++;}
-      
-    }
-    printf("f11\n");
-    if (i + 1 == (int) ap->len*64) {
-      printf("f12\n");
-      //if(sum > 9) {
-	printf("f13\n");
-	hex[k++] = get_hex_char(sum);
-	printf("f14\n");
-	
-	//}
-      //      hex[k] = sum;
-      // printf("f15\n");
-      
-    }
-    temp = temp >> 1;
-    printf("f16a");
+  //print_binary(temp);
+
+
+  for(int i = 0, j = 0; i < ap->len * 64; i+=4, j++)  {
+    result = temp & 0xf;
+
+    printf("res %d: %d\n", i, result);
+
+    hex[j] =  get_hex_char(result);
+
+    temp >>= 4;
+
+  }
+
+  printf("\n %s\n", hex);
+
+  int hex_length = strlen(hex) - 1;
+  int l = strlen(hex);
+
+  for (int i = 0; i < l; i+=2)
+  {
+    char s = hex[hex_length];
+    hex[hex_length] = hex[i];
+    hex[i] = s;
+    hex_length-=2;
   }
   
-  
+
+  printf("\n %s", hex);
+
   return hex;
 }
 
