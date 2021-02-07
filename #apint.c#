@@ -254,7 +254,6 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
   }
 
   // 0000 0000 0000 0000 1
-  /**
   if (carry == 1) {
     hex[i] = '1';
   }
@@ -265,9 +264,9 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
     newApInt->len = (int) strlen(hex) / 8;
   }
 
-  **/
+
   
-  for(int i = 0, n=0; i < newApInt->len; i++, n+=8) {
+  for(int i = 0, n = 0; i < newApInt->len; i++, n+=8) {
     char array[16];
     strncpy(array, hex + n, 8);
     newApInt->data[i] = (strtoull(array, NULL,  16));

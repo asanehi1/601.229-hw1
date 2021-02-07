@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
-	TEST(basicAdd);
-	TEST(basicSub);
+	//TEST(basicAdd);
+	//TEST(basicSub);
 	TEST(testCreateFromHex);
 	TEST_FINI();
 }
@@ -177,8 +177,8 @@ void testAdd(TestObjs *objs) {
 
 	/* 1 + 0 = 1 */
        	sum = apint_add(objs->ap1, objs->ap0);
-	//printf("%d \n", (int)  apint_get_bits(sum, 0));
-	//printf("%s \n", apint_format_as_hex(sum));
+	printf("bits: %d \n", (int)  apint_get_bits(sum, 0));
+	printf("hex: %s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
 
 	apint_destroy(sum);
