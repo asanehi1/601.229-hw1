@@ -144,7 +144,10 @@ void testCompare(TestObjs *objs) {
       	ASSERT(apint_compare(objs->minus110660361, objs->minus1) < 0);
 	/* -1 > -110660361 */
        	ASSERT(apint_compare(objs->minus1, objs->minus110660361) > 0);
-
+	
+	// compare large numbers
+	ApInt *sum = apint_add(objs->max1, objs->ap1);
+	ASSERT(apint_compare(sum, objs->ap0) > 0);
 	  
 	
 }
@@ -177,10 +180,7 @@ void testAdd(TestObjs *objs) {
 
 	/* 1 + 0 = 1 */
        	sum = apint_add(objs->ap1, objs->ap0);
-	printf("bits: %d \n", (int)  apint_get_bits(sum, 0));
-	printf("hex: %s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
-
 	apint_destroy(sum);
 	free(s);
 
@@ -199,7 +199,7 @@ void testAdd(TestObjs *objs) {
 
 	/* FFFFFFFFFFFFFFFF + 0 */
 	sum = apint_add(objs->max1, objs->ap0);
-	printf("%s \n", apint_format_as_hex(sum));
+	//printf("%s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("ffffffffffffffff", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);
@@ -207,13 +207,16 @@ void testAdd(TestObjs *objs) {
 
 	/* FFFFFFFFFFFFFFFF + 1 = 10000000000000000 */
 	sum = apint_add(objs->max1, objs->ap1);
-	//printf("%d \n", (int)  apint_get_bits(sum, 0));
-	printf("not hex yet  %" PRIu64 "\n", sum->data[1]);
-	
-	printf("%s \n", apint_format_as_hex(sum));
 	ASSERT(0 == strcmp("10000000000000000", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);
+
+	/*- 110660361 +- 1 = -110660362 */
+	sum = apint_add(objs->minus110660361, objs->minus1);
+	ASSERT(0 == strcmp("-6988b0a", (s = apint_format_as_hex(sum))));
+	apint_destroy(sum);
+	free(s);
+
 }
 
 void testSub(TestObjs *objs) {

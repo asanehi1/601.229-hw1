@@ -129,7 +129,7 @@ char * swap_hex_values(char *hex) {
     hex[end--] = temp;
   }
 
-  printf("swapped: %s\n", hex);
+  //printf("swapped: %s\n", hex);
 
   return hex;
 }
@@ -157,12 +157,12 @@ char *apint_format_as_hex(const ApInt *ap) {
    if(ap->flags == 1) {
       hex[counter++] = '-';
     }
-   printf("len : %d \n", ap->len);
+   //printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
     uint64_t temp = __bswap_64(ap->data[i]);
-    printf("\nin format function: ");
-    printf("before %" PRIu64 "\n", temp);
+    // printf("\nin format function: ");
+    //printf("before %" PRIu64 "\n", temp);
     //print_binary(temp); 
     int bool = 1;
     if (temp == (uint64_t) 0 && i < ap->len -1) {
@@ -336,15 +336,16 @@ uint64_t unsigned_sub(const uint64_t a, const uint64_t b) {
 }
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
- 
-  ApInt * newApInt;
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   
-  if (a->flags == b->flags) {
-    // both have same flag 
+  if (a->flags == 0 && b->flags == 0) {
+    // both pos
     newApInt = unsigned_add(a, b);
-    newApInt->flags = a->flags;
-    // flag should be correct 
-  } 
+  } else if (a->flags == b->flags) {
+    // both neg
+    newApInt = unsigned_add(apint_negate(a), apint_negate(b));
+    newApInt->flags = 1;
+  }
   // else if (a->data[n] < b->data[n] && a->flags == 1) {
   //   // a < b and a is negative and b is positive
   //   result = unsigned_sub(b->data[n], a->data[n]);
@@ -417,15 +418,37 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
  * return -1 if left < right
  */
 int apint_compare(const ApInt *left, const ApInt *right) {
-  if (left->data[0] == right->data[0] && left->flags == right->flags) {
-    return 0;
-  } else if (left->data[0] < right->data[0] && right->flags == 0) {
-    return -1;
-  } else if (right->data[0] < left->data[0] && left->flags == 0) {
-    return 1;
-  } else if (left->data[0] >= right->data[0] && left->flags == 1) {
+
+  if (left->len == right->len) {
+   int  n = right->len -1;
+    // just compare data[n] with n being largest 
+    if (left->data[n] == right->data[n] && left->flags == right->flags) {
+      return 0;
+    } else if (left->data[n] < right->data[n] && right->flags == 0) {
+      return -1;
+    } else if (right->data[n] < left->data[n] && left->flags == 0) {
+      return 1;
+    } else if (left->data[n] >= right->data[n] && left->flags == 1) {
+      return -1;
+    } else {
+      return 1;
+    } 
+
+  } else if (left->len > right-> len) {
+    // left len > right len
+    if (left->flags == 0) {
+       	// left is bigger 
+       	return 1;
+    }
+    // right is bigger
     return -1;
   } else {
+    // left len < right len
+    if (right->flags == 0) {
+      	// right is bigger
+       	return -1;
+    }
+    // else left is bigger 
     return 1;
   }
 }
