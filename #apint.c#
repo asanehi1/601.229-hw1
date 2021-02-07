@@ -155,14 +155,14 @@ char *apint_format_as_hex(const ApInt *ap) {
   int counter = 0;
    int remainder = 0;
    if(ap->flags == 1) {
-      hex[counter++] = '-';
+     hex[counter++] = '-';
     }
-   printf("len : %d \n", ap->len);
+   // printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
     uint64_t temp = __bswap_64(ap->data[i]);
-    printf("\nin format function: ");
-    printf("before %" PRIu64 "\n", temp);
+    //printf("\nin format function: ");
+    //printf("before %" PRIu64 "\n", temp);
     //print_binary(temp); 
     int bool = 1;
     if (temp == (uint64_t) 0 && i < ap->len -1) {
@@ -231,15 +231,16 @@ int get_hex_num(char c) {
   }
 }
 
+
 ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
   newApInt->len = 1;
-  newApInt->flags = 0;
-
   
   char* hex_a = apint_format_as_hex(a);
   char* hex_b = apint_format_as_hex(b);
+
+
   char* hex = (char*)malloc(sizeof(char) * 17);
 
   
@@ -321,7 +322,7 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
     strncpy(array, hex + digitsFromEnd, digitsLeft);
     array[digitsLeft] = '\0';
     newApInt->data[i] = __bswap_64(strtoull(array, NULL,  16));
-    //printf("swappet: %s\n", array);
+    printf("swappet: %s\n", array);
   }
     
     
@@ -334,6 +335,8 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
 uint64_t unsigned_sub(const uint64_t a, const uint64_t b) {
   return a - b;
 }
+
+
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
  
@@ -371,6 +374,7 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
 
  
 }
+
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   //  uint64_t result;
