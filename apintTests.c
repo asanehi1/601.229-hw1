@@ -45,6 +45,7 @@ void testIsNegative(TestObjs *objs);
 void testIsZero(TestObjs *objs);
 void basicAdd(TestObjs *objs);
 void basicSub(TestObjs *objs);
+void testCreateFromHex(TestObjs *objs);
 
 int main(int argc, char **argv) {
 	TEST_INIT();
@@ -68,6 +69,7 @@ int main(int argc, char **argv) {
 	TEST(testIsZero);
 	TEST(basicAdd);
 	TEST(basicSub);
+	TEST(testCreateFromHex);
 	TEST_FINI();
 }
 
@@ -99,7 +101,7 @@ void cleanup(TestObjs *objs) {
 }
 
 void testCreateFromU64(TestObjs *objs) {
-  uint64_t temp = apint_get_bits(objs->ap1, 0);
+  //uint64_t temp = apint_get_bits(objs->ap1, 0);
   //printf("final " "%" PRIu64 "\n", temp);
   ASSERT(0UL == apint_get_bits(objs->ap0, 0));
 
@@ -405,6 +407,32 @@ void basicSub(TestObjs *objs) {
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
 
+}
+
+void testCreateFromHex (TestObjs *objs) {
+	ASSERT(0UL == apint_get_bits(objs->ap0, 0));
+	ApInt* ap;
+	ap = apint_create_from_hex("0");
+	ASSERT(0UL == apint_get_bits(ap, 0));
+	free(ap);
+
+	ap = apint_create_from_hex("-1");
+	ASSERT(-1UL == apint_get_bits(ap, 0));
+	free(ap);
+
+	ap = apint_create_from_hex("6988b09");
+	ASSERT(110660361UL == apint_get_bits(ap, 0));
+	free(ap);
+
+	
+
+	ap = apint_create_from_hex("ffffffffffffffff");
+	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
+	free(ap);
+
+	ap = apint_create_from_hex("FFFFFFFFFFFFFFFF");
+	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
+	free(ap);
 }
 
 /* TODO: add more test functions */
