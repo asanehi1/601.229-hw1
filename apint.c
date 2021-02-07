@@ -151,31 +151,43 @@ void print_binary(uint64_t w) {
 }
 
 char *apint_format_as_hex(const ApInt *ap) {
-  char* hex = (char*) malloc(sizeof(char) * 17);
-  
-  for (int i = 0; i < (int) ap->len; i++) {
+  char* hex = (char*) malloc((int)ap->len * sizeof(char) * 17);
+  int counter = 0;
+   int remainder = 0;
+   if(ap->flags == 1) {
+      hex[counter++] = '-';
+    }
+   printf("len : %d \n", ap->len);
+   
+   for (int i = 0; i < (int) ap->len; i++) {
     uint64_t temp = __bswap_64(ap->data[i]);
     printf("\nin format function: ");
-    print_binary(temp);
-    int remainder = 0;
-    int counter = 0;
-
-    if(ap->flags == 1 && i == 0) {
-      hex[counter++] = '-';
+    printf("before %" PRIu64 "\n", temp);
+    //print_binary(temp); 
+    int bool = 1;
+    if (temp == (uint64_t) 0 && i < ap->len -1) {
+      bool = 0;
+      temp = 16;
     }
 
     do {
-      remainder = temp % 16;
-      //remainder = temp & 15;
-      //printf("rem: %d\n", remainder);
-      temp /= 16;
-      //temp >>= 4;
+      if (bool == 0) {
+	temp--;
+      } else {
+	// regular code
+	remainder = temp % 16;
+	//remainder = temp & 15;
+	//printf("rem: %d\n", remainder);
+	temp /= 16;
+	//temp >>= 4;
+      }
       hex[counter++] =  get_hex_char(remainder);
+      //printf("re: %d", hex[counter - 1]);
     } while ((int) temp != 0);
     
   }
   
-  printf("before swap: %s \n", hex);
+   //printf("before swap: %s \n", hex);
   return swap_hex_values(hex);
   
 }
@@ -225,55 +237,97 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
   newApInt->len = 1;
   newApInt->flags = 0;
 
+  
   char* hex_a = apint_format_as_hex(a);
   char* hex_b = apint_format_as_hex(b);
   char* hex = (char*)malloc(sizeof(char) * 17);
 
+  
   int length, carry = 0, i;
+  int diff;
 
   if(strlen(hex_a) > strlen(hex_b)) {
     length = strlen(hex_a);
+    diff = length - strlen(hex_b);
   } else {
     length = strlen(hex_b);
+    diff  = length - strlen(hex_a);
   }
 
-  printf("\n");
+  //printf("length: %d ", length);
+  // printf("\n");
 
   for (i = 0; i < length; i++) {
-    printf("a:%c + b:%c = ", hex_a[i], hex_b[i]);
-    int num = get_hex_num(hex_a[i]) + get_hex_num(hex_b[i]) + carry;
-    printf("%d\n", num);
-
+    //printf("a:%c + b:%c = ", hex_a[diff - i], hex_b[i]);
+    int num = get_hex_num(hex_a[diff - i]) + get_hex_num(hex_b[i]) + carry;
+    //printf("%d\n", num);
+    
     if(num > 15) {
       carry = 1;
     } else {
       carry = 0;
     }
 
+
     hex[i] = get_hex_char(num % 16);
+    //printf("try hi %c", hex[i]);
   }
 
   // 0000 0000 0000 0000 1
-  /**
+
   if (carry == 1) {
     hex[i] = '1';
   }
 
   hex = swap_hex_values(hex);
 
-  if(strlen(hex) > 15) {
-    newApInt->len = (int) strlen(hex) / 8;
+  if(strlen(hex) > 16) {
+    int extra = 0;
+    if ((int)strlen(hex) % 16 != 0 ) {
+      extra = 1;
+      //printf("hi this shouldn't happen yet\n");
+    }
+    newApInt->len = (int) strlen(hex) / 16 + extra;
+    //printf("so len: %d\n", newApInt->len);
   }
 
-  **/
-  
-  for(int i = 0, n=0; i < newApInt->len; i++, n+=8) {
+  /**
+  for(int i = 0, n = 0; i < newApInt->len; i++, n += 16) {
     char array[16];
-    strncpy(array, hex + n, 8);
-    newApInt->data[i] = (strtoull(array, NULL,  16));
+    strncpy(array, hex + n, 16);
+    array[16] = '\0';
+    
+    newApInt->data[i] = __bswap_64(strtoull(array, NULL,  16));
   }
+  **/
+
+  int digitsFromEnd = strlen(hex);
+  int digitsLeft = 16;
+  // 16 unless otherwise stated
+  
+  for (int i = 0; i < newApInt->len; i++) {
+    if (i < newApInt->len -1) {
+      digitsFromEnd -= 16;
+      digitsLeft = 16;
+    } else {
+      digitsLeft = strlen(hex) % 16;
+      if (digitsLeft == 0) {
+	digitsLeft = 16;
+      }
+      digitsFromEnd -= digitsLeft;
+    }
+    
+    char array[digitsLeft];
+    strncpy(array, hex + digitsFromEnd, digitsLeft);
+    array[digitsLeft] = '\0';
+    newApInt->data[i] = __bswap_64(strtoull(array, NULL,  16));
+    //printf("swappet: %s\n", array);
+  }
+    
+    
 
   free(hex);
+  //newApInt->data[0] = __bswap_64(strtoull(hex, NULL,  16));
   return newApInt;
 }
 
