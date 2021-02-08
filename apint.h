@@ -45,6 +45,7 @@ void print_binary(uint64_t n);
   //uint64_t unsigned_add(const uint64_t a, const uint64_t b);
   uint64_t unsigned_sub(const uint64_t a, const uint64_t b);
    ApInt *apint_add_n(const ApInt *a, const ApInt *b, const int n, const int overflow);
+  int  get_int_from_hex(char hex);
   
 #ifdef __cplusplus
 }

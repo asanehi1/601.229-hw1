@@ -28,20 +28,53 @@ ApInt *apint_create_from_u64(uint64_t val) {
 }
 
 ApInt *apint_create_from_hex(const char *hex) {
-	ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
-  newApInt->len = 1;
-  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
-  newApInt->data[0] = __bswap_64(strtoull(hex, NULL,  16));
-  //print_binary(newApInt->data[0]);
 
+  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
+  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+
+  int counter = 0;
   if(hex[0] == '-') {
     newApInt->flags = 1;
+    counter++;
   } else {
     newApInt->flags = 0;
   }
+  while (hex[counter] == '0' && strlen(hex) > 1) {
+    // help count leading zeros
+      counter++;
+  }
+  if (counter == strlen(hex)) {
+    counter--;
+  }
+  //printf("%d \n", counter);
 
+  int extra = 0;
+  if ((strlen(hex) - counter) % 16 != 0) {
+    extra = 1;
+  }
+  int n = (strlen(hex) - counter) / 16 + extra;
+  //printf("%d \n", n);
+
+  int digitLeft = 16;
+  for (int i = 0; i < n; i++) {
+    char * temp = (char*) malloc( sizeof(char) * 17);
+    if (i == n - 1) {
+      digitLeft == (strlen(hex) - counter) % 16;
+    }
+    strncpy(temp, hex + counter, digitLeft);
+    //printf("hi: %s \n", temp);
+    newApInt->data[i] =  __bswap_64(strtoull(temp, NULL,  16));
+    counter += 16;
+  }
+    
+
+
+  //printf("final  %" PRIu64 "\n", __bswap_64(newApInt->data[0]));
   return newApInt;
 }
+  
+
+    
 
 /* Deallocates the memory used by the ApInt instance pointed-to by the ap parameter */
 void apint_destroy(ApInt *ap) {
@@ -76,6 +109,8 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 
 /* return which digit has highest bit */
 int apint_highest_bit_set(const ApInt *ap) {
+  int n = (int) ap->len - 1;
+  // I think largest value is stored in data[0]
   uint64_t temp = __bswap_64(ap->data[0]);
   //uint64_t temp = (ap->data[0]);
   if (temp == 0) {
@@ -92,8 +127,9 @@ int apint_highest_bit_set(const ApInt *ap) {
     // shift 
     temp = temp >> 1;
   }
-  return highestBit;
+  return highestBit + n * 64;
 }
+
 
 char get_hex_char(int num) {
   switch(num) {
@@ -112,7 +148,8 @@ char get_hex_char(int num) {
     case 12: return 'c'; break;
     case 13: return 'd'; break;
     case 14: return 'e'; break;
-    default: return 'f'; break;
+  case 15: return 'f'; break;
+    default: return '\0'; break;
   }
 }
 
@@ -122,6 +159,7 @@ char * swap_hex_values(char *hex) {
   int start = 0;
   if (hex[0] == '-') {
     start = 1;
+    printf("neg");
   }
   while (start < end) {
     char temp = hex[start];
@@ -154,9 +192,7 @@ char *apint_format_as_hex(const ApInt *ap) {
   char* hex = (char*) malloc((int)ap->len * sizeof(char) * 17);
   int counter = 0;
    int remainder = 0;
-   if(ap->flags == 1) {
-      hex[counter++] = '-';
-    }
+
    //printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
@@ -187,9 +223,18 @@ char *apint_format_as_hex(const ApInt *ap) {
     
   }
   
-   //printf("before swap: %s \n", hex);
-  return swap_hex_values(hex);
   
+  hex = swap_hex_values(hex);
+  if(ap->flags == 1) {
+    char* neg = (char*) malloc((int)ap->len * sizeof(char) * 17);
+    neg[0] = '-';
+    //printf("this is neg\n");
+    strncat(neg, hex, 16);
+     free(hex);
+     //printf("after : %s \n", neg);
+     return neg;
+    }
+  return hex;
 }
 
 ApInt *apint_negate(const ApInt *ap) {
@@ -258,7 +303,7 @@ ApInt* unsigned_add(const ApInt *a, const ApInt *b) {
   // printf("\n");
 
   for (i = 0; i < length; i++) {
-    //printf("a:%c + b:%c = ", hex_a[diff - i], hex_b[i]);
+    // printf("a:%c + b:%c = ", hex_a[diff - i], hex_b[i]);
     int num = get_hex_num(hex_a[diff - i]) + get_hex_num(hex_b[i]) + carry;
     //printf("%d\n", num);
     
@@ -452,3 +497,4 @@ int apint_compare(const ApInt *left, const ApInt *right) {
     return 1;
   }
 }
+

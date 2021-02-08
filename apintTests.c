@@ -28,6 +28,7 @@ typedef struct {
 	ApInt *minus1;
 	/* TODO: add additional fields of test fixture */
         ApInt *minus110660361;
+   ApInt *large;
 } TestObjs;
 
 TestObjs *setup(void);
@@ -83,7 +84,7 @@ TestObjs *setup(void) {
 	/* TODO: initialize additional members of test fixture */
 
 	objs->minus110660361 = apint_negate(objs->ap110660361);
-
+	//objs->large = apint_createFrom;
  
 	return objs;
 }
@@ -111,6 +112,7 @@ void testCreateFromU64(TestObjs *objs) {
   ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
   ASSERT(110660361UL == apint_get_bits(objs->ap110660361, 0));
   ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(objs->max1, 0));
+  
 }
 
 
@@ -155,7 +157,7 @@ void testCompare(TestObjs *objs) {
 void testFormatAsHex(TestObjs *objs) {
 	char *s;
 
-		ASSERT(0 == strcmp("0", (s = apint_format_as_hex(objs->ap0))));
+        ASSERT(0 == strcmp("0", (s = apint_format_as_hex(objs->ap0))));
 	free(s);
 
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(objs->ap1))));
@@ -166,6 +168,13 @@ void testFormatAsHex(TestObjs *objs) {
 
 	ASSERT(0 == strcmp("ffffffffffffffff", (s = apint_format_as_hex(objs->max1))));
 	free(s);
+
+	ASSERT(0 == strcmp("-6988b09", (s = apint_format_as_hex(objs->minus110660361))));
+	free(s);
+
+	ASSERT(0 == strcmp("-ffffffffffffffff", (s = apint_format_as_hex(apint_negate(objs->max1)))));
+	free(s);
+	
 }
 
 void testAdd(TestObjs *objs) {
@@ -208,6 +217,9 @@ void testAdd(TestObjs *objs) {
 	/* FFFFFFFFFFFFFFFF + 1 = 10000000000000000 */
 	sum = apint_add(objs->max1, objs->ap1);
 	ASSERT(0 == strcmp("10000000000000000", (s = apint_format_as_hex(sum))));
+	//	printf("data[0]:" PRIu64 "\n", sum->data[0]);
+	//	printf("data[1]:" PRIu64 "\n", sum->data[1]);
+	
 	apint_destroy(sum);
 	free(s);
 
@@ -413,21 +425,24 @@ void basicSub(TestObjs *objs) {
 }
 
 void testCreateFromHex (TestObjs *objs) {
-	ASSERT(0UL == apint_get_bits(objs->ap0, 0));
 	ApInt* ap;
+
 	ap = apint_create_from_hex("0");
 	ASSERT(0UL == apint_get_bits(ap, 0));
 	free(ap);
 
+	ap = apint_create_from_hex("00000000000");
+	ASSERT(0UL == apint_get_bits(ap, 0));
+	free(ap);
+
 	ap = apint_create_from_hex("-1");
-	ASSERT(-1UL == apint_get_bits(ap, 0));
+	ASSERT(1UL == apint_get_bits(ap, 0));
+	ASSERT(ap->flags == 1);
 	free(ap);
 
 	ap = apint_create_from_hex("6988b09");
 	ASSERT(110660361UL == apint_get_bits(ap, 0));
 	free(ap);
-
-	
 
 	ap = apint_create_from_hex("ffffffffffffffff");
 	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
@@ -436,6 +451,13 @@ void testCreateFromHex (TestObjs *objs) {
 	ap = apint_create_from_hex("FFFFFFFFFFFFFFFF");
 	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
 	free(ap);
+
+	ap = apint_create_from_hex("-00000000006988b09");
+	ASSERT(110660361UL == apint_get_bits(ap, 0));
+	ASSERT(ap->flags == 1);
+	free(ap);
+
+
 }
 
 /* TODO: add more test functions */
