@@ -111,15 +111,15 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 int apint_highest_bit_set(const ApInt *ap) {
   int n = (int) ap->len - 1;
   // I think largest value is stored in data[0]
-  uint64_t temp = __bswap_64(ap->data[0]);
+  uint64_t temp = __bswap_64(ap->data[n]);
   //uint64_t temp = (ap->data[0]);
-  if (temp == 0) {
+  if (temp == (uint64_t) 0) {
     return -1;
   }
   // highet bit stores the value of highest bit
   // + updates when necessary
   int highestBit = 0;
-  for (int i = 0; i < (int) ap->len * 64; i++) {
+  for (int i = 0; i < 64; i++) {
     // if bit == 1
     if (temp & 1) {
       highestBit = i;
@@ -127,7 +127,7 @@ int apint_highest_bit_set(const ApInt *ap) {
     // shift 
     temp = temp >> 1;
   }
-  return highestBit + n * 64;
+  return highestBit + (n * 64);
 }
 
 
