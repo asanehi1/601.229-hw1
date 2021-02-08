@@ -30,7 +30,6 @@ ApInt *apint_create_from_u64(uint64_t val) {
 ApInt *apint_create_from_hex(const char *hex) {
 
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
-  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
 
   int counter = 0;
   if(hex[0] == '-') {
@@ -54,6 +53,9 @@ ApInt *apint_create_from_hex(const char *hex) {
   }
   int n = (strlen(hex) - counter) / 16 + extra;
   //printf("%d \n", n);
+
+   newApInt->data = (uint64_t*)malloc(n * sizeof(uint64_t));
+   newApInt->len = n;
 
   int digitLeft = 16;
   for (int i = 0; i < n; i++) {
