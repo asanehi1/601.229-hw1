@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 TestObjs *setup(void) {
 	TestObjs *objs = malloc(sizeof(TestObjs));
 	objs->ap0 = apint_create_from_u64(0UL);	
-	objs->ap1 = apint_create_from_u64(1UL);
+	objs->ap1 = apint_create_from_u64(1U);
 	objs->ap110660361 = apint_create_from_u64(110660361UL);
 	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
 	objs->minus1 = apint_negate(objs->ap1);
@@ -195,10 +195,10 @@ void testAdd(TestObjs *objs) {
 	char *s;
 	
 	/* 0 + 0 = 0 */
-	sum = apint_add(objs->ap0, objs->ap0);
-	ASSERT(0 == strcmp("0", (s = apint_format_as_hex(sum))));
-	apint_destroy(sum);
-	free(s);
+	// sum = apint_add(objs->ap0, objs->ap0);
+	// ASSERT(0 == strcmp("0", (s = apint_format_as_hex(sum))));
+	// apint_destroy(sum);
+	// free(s);
 
 	/* 1 + 0 = 1 */
        	sum = apint_add(objs->ap1, objs->ap0);
@@ -373,6 +373,11 @@ void basicAdd(TestObjs *objs) {
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
 
+	sum = apint_add(objs->max1, objs->ap1);
+	ASSERT(1 == apint_get_bits(sum, 0));
+	ASSERT(sum->flags == 1);
+	apint_destroy(sum);
+
 }
 
 void basicSub(TestObjs *objs) {
@@ -434,7 +439,7 @@ void basicSub(TestObjs *objs) {
 	ASSERT(110660361 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
-
+	
 }
 
 void testCreateFromHex (TestObjs *objs) {
