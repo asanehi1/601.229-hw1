@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
-	//TEST(basicAdd);
+	TEST(basicAdd);
 	//TEST(basicSub);
 	TEST(testCreateFromHex);
 	TEST_FINI();
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 TestObjs *setup(void) {
 	TestObjs *objs = malloc(sizeof(TestObjs));
 	objs->ap0 = apint_create_from_u64(0UL);	
-	objs->ap1 = apint_create_from_u64(1U);
+	objs->ap1 = apint_create_from_u64(1UL);
 	objs->ap110660361 = apint_create_from_u64(110660361UL);
 	objs->max1 = apint_create_from_u64(0xFFFFFFFFFFFFFFFFUL);
 	objs->minus1 = apint_negate(objs->ap1);
@@ -195,13 +195,13 @@ void testAdd(TestObjs *objs) {
 	char *s;
 	
 	/* 0 + 0 = 0 */
-	// sum = apint_add(objs->ap0, objs->ap0);
-	// ASSERT(0 == strcmp("0", (s = apint_format_as_hex(sum))));
-	// apint_destroy(sum);
-	// free(s);
+	sum = apint_add(objs->ap0, objs->ap0);
+	ASSERT(0 == strcmp("0", (s = apint_format_as_hex(sum))));
+	apint_destroy(sum);
+	free(s);
 
 	/* 1 + 0 = 1 */
-       	sum = apint_add(objs->ap1, objs->ap0);
+    sum = apint_add(objs->ap1, objs->ap0);
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);
@@ -213,7 +213,7 @@ void testAdd(TestObjs *objs) {
 	free(s);
 	
 
-	/* 110660361 + 1 = 110660362 */
+	// /* 110660361 + 1 = 110660362 */
 	sum = apint_add(objs->ap110660361, objs->ap1);
 	ASSERT(0 == strcmp("6988b0a", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
@@ -338,6 +338,7 @@ void basicAdd(TestObjs *objs) {
 	
 
 	/* -1 + 1 = 0 */
+	printf("hello\n");
 	sum = apint_add(objs->minus1, objs->ap1);
 	ASSERT(0 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 0);
