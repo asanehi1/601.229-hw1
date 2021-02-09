@@ -381,6 +381,8 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
     carryIn = carryOut;   
   }
 
+  //2 0000 0000 0000 0000
+
   if (carryIn > 0) {
     tempData[i++] = carryIn;
   }
