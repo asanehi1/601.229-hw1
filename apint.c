@@ -237,6 +237,9 @@ char *apint_format_as_hex(const ApInt *ap) {
   int counter = 0;
   int remainder = 0;
 
+  printf("\nIn hex function\n");
+  //print_binary(ap);
+
   if (ap->flags == 1) {
     hex[0] = '-';
     counter++;
@@ -244,9 +247,10 @@ char *apint_format_as_hex(const ApInt *ap) {
    //printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
+     //printf("%d\n", i);
     uint64_t temp  = __bswap_64(ap->data[i]);
     // printf("\nin format function: ");
-    //printf("before %" PRIu64 "\n", temp);
+    //printf("\nbefore hex %" PRIu64 "\n", temp);
     //print_binary(temp); 
     int bool = 1;
     if (temp == (uint64_t) 0 && i < (int) ap->len -1) {
@@ -273,6 +277,7 @@ char *apint_format_as_hex(const ApInt *ap) {
   
   
   hex = swap_hex_values(hex);
+  printf("hex: %s\n", hex);
   /**
 
   if(ap->flags == 1) {
@@ -348,28 +353,32 @@ int get_length(const ApInt* a, const ApInt* b) {
   }
 }
 
-void unsigned_add(const ApInt* a, const ApInt* b, ApInt* ap, char c) {
+ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
   int carryIn = 0, i, carryOut = 0;
   int length = get_length(a,b);
+
+  ApInt * ap = (ApInt*)malloc(sizeof(ApInt));
   uint64_t* tempData = (uint64_t*)malloc(sizeof(uint64_t) * length);
+  printf("\nlength: %d\n", length);
 
   for(i = 0; i < length; i++) {
     uint64_t temp1 = __bswap_64(a->data[i]);
     uint64_t temp2 = __bswap_64(b->data[i]);
 
+    printf("" "%" PRIu64 , (temp1) );
     if(c == '+') {
       carryOut = add_overflow(temp1, temp2, carryIn); //carryIn = 0 carryOut = 1  carryIn = 1 carryOut = 1
       tempData[i]= (temp1 + temp2 + carryIn);          //carryIn = 0               carryIn = 1
-      carryIn = carryOut;                             //carryIn = 1               carryIn = 1
-      printf("" "%" PRIu64 , (temp1) );
+      //carryIn = carryOut;                             //carryIn = 1               carryIn = 1
       printf(" + " "%" PRIu64 , temp2 );
-      printf(" = " "%" PRIu64 "\n",tempData[i] );
     } else {
       tempData[i]= temp1 - temp2;
-      printf("" "%" PRIu64 , (temp1) );
       printf(" - " "%" PRIu64 , temp2 );
-      printf(" = " "%" PRIu64 "\n",tempData[i] );
     }
+    printf(" + %d", carryIn);
+    printf(" = " "%" PRIu64 "\n",tempData[i] );
+    printf("CarryOut: %d\n", carryOut);
+    carryIn = carryOut;   
   }
 
   if (carryIn > 0) {
@@ -378,15 +387,20 @@ void unsigned_add(const ApInt* a, const ApInt* b, ApInt* ap, char c) {
 
   ap->len = i;
   ap->data = (uint64_t*)malloc(sizeof(uint64_t) * i);
+  //ap->data = (uint64_t*)realloc(tempData, sizeof(uint64_t) * i);
+  printf("Final length: %d\n", i);
 
   for (int j = 0; j < (int)ap->len; j++) {
-    ap->data[j] = tempData[j];
-    
+    ap->data[j] = __bswap_64(tempData[j]);
+    //printf("\nResult final: " "%" PRIu64 "\n", ap->data[j] );
   }
+
+ //print_binary(ap);
+
   //printf("\nResult final: " "%" PRIu64 "\n", ap->data[0] );
-  free(tempData);
-  print_binary(ap);
   
+  free(tempData);
+  return ap;
 }
 
 int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
@@ -399,12 +413,12 @@ int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
 }
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
-  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
+  ApInt * newApInt;
   //newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
   
   if (a->flags == 0 && b->flags == 0) {
     // both positive 
-    unsigned_add(a, b, newApInt, '+');
+    newApInt = unsigned_add(a, b, '+');
     //print_binary(result);
     //printf("result: " "%" PRIu64 "\n", newApInt->data[0]);
     newApInt->flags = 0;
@@ -412,27 +426,27 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   else if (a -> flags ==  b->flags) {
     // both are negative 
     //result = unsigned_add(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '+');
+    newApInt = unsigned_add(a, b, '+');
     newApInt->flags = 1;
   } else if (a->data[0] < b->data[0] && a->flags == 1) {
     // a < b and a is negative and b is positive
     //result = unsigned_sub(b->data[0], a->data[0]);
-    unsigned_add(b, a, newApInt, '-');
+    newApInt = unsigned_add(b, a, '-');
     newApInt->flags = 0;
   }  else if (a->data[0] < b->data[0]) {
     // a < b and a is positive while b is neg
     //result = unsigned_sub(b->data[0], a->data[0]);
-    unsigned_add(b, a, newApInt, '-');
+    newApInt = unsigned_add(b, a, '-');
     newApInt->flags = 1;
   } else if (a->data[0] > b->data[0] && a->flags == 1) {
      // a > b and a is neg  while b is pos
     //result = unsigned_sub(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '-');
+    newApInt = unsigned_add(a, b, '-');
     newApInt->flags = 1;
   } else {
     // a > b and a is pos  while b is neg
     //result = unsigned_sub(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '-');
+    newApInt = unsigned_add(a, b, '-');
     newApInt->flags = 0;
   } 
   
@@ -442,37 +456,39 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
 }
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
-  ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
+   ApInt * newApInt;
   if (a->data[0] > b->data[0] && a->flags == b->flags) {
     //a > b  
     //result = unsigned_sub(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '-');
+    newApInt = unsigned_add(a, b, '-');
     // if both positive, sign = positive
     // if both negative, sign = negative
     newApInt->flags = a->flags;
   } else if (a->data[0] > b->data[0]) {
     // a > b and signs r opposite 
     //result = unsigned_add(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '+');
+    newApInt = unsigned_add(a, b, '+');
     newApInt->flags = a->flags;
   } else if (a->data[0] < b->data[0] && a->flags == b->flags) {
     //a < b  
     //result = unsigned_sub(b->data[0], a->data[0]);
-    unsigned_add(b, a, newApInt, '-');
+    newApInt = unsigned_add(b, a, '-');
     // opposite sign
     newApInt->flags = (a->flags + 1) % 2;
   } else if (a->data[0] < b->data[0]) {
     // a > b and signs r opposite 
     //result = unsigned_add(a->data[0], b->data[0]);
-    unsigned_add(a, b, newApInt, '-');
+    newApInt = unsigned_add(a, b, '-');
     newApInt->flags = a->flags;
   } else if (apint_compare(a, b) == 0) {
     //result = 0;
+    newApInt = (ApInt*)malloc(sizeof(ApInt));
     newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
     newApInt->data[0] = 0; 
     newApInt->flags = 0;
   } else {
     //result = a->data[0] * 2;
+    newApInt = (ApInt*)malloc(sizeof(ApInt));
     newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
     newApInt->data[0] = a->data[0] * 2;
     newApInt->flags = a->flags;
