@@ -23,7 +23,7 @@ ApInt *apint_create_from_u64(uint64_t val) {
   newApInt->len = 1;
   newApInt->flags = 0; 
   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
-  newApInt->data[0] = __bswap_64(val);
+  newApInt->data[0] = (val);
   return newApInt;
 }
 
@@ -97,7 +97,7 @@ ApInt *apint_create_from_hex(const char *hex) {
     //printf("digitLeft %d \n", digitLeft);
     //printf("string: %s \n", hex);
     //printf("hi: %s \n", temp);
-    newApInt->data[i] = __bswap_64(strtoull(temp, NULL,  16));
+    newApInt->data[i] = (strtoull(temp, NULL,  16));
     //counter += 16;
     digitsFromLeft -= 16;
     free(temp);
@@ -105,7 +105,7 @@ ApInt *apint_create_from_hex(const char *hex) {
     
 
   //printf("\n");
-  //printf("final  %" PRIu64 "\n", __bswap_64(newApInt->data[0]));
+  //printf("final  %" PRIu64 "\n", (newApInt->data[0]));
   return newApInt;
 }
 
@@ -141,7 +141,7 @@ int apint_is_negative(const ApInt *ap) {
 
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
-  uint64_t temp = __bswap_64(ap->data[n]);
+  uint64_t temp = (ap->data[n]);
   //printf("value: %" PRIu64, temp);
   //uint64_t temp = (ap->data[n]);
   return  temp;
@@ -151,7 +151,7 @@ uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
 int apint_highest_bit_set(const ApInt *ap) {
   int n = (int) ap->len - 1;
   // I think largest value is stored in data[0]
-  uint64_t temp = __bswap_64(ap->data[n]);
+  uint64_t temp = (ap->data[n]);
   //uint64_t temp = (ap->data[0]);
   if (temp == (uint64_t) 0 && n == 0) {
     return -1;
@@ -248,7 +248,7 @@ char *apint_format_as_hex(const ApInt *ap) {
    
    for (int i = 0; i < (int) ap->len; i++) {
      //printf("%d\n", i);
-    uint64_t temp  = __bswap_64(ap->data[i]);
+    uint64_t temp  = (ap->data[i]);
     // printf("\nin format function: ");
     //printf("\nbefore hex %" PRIu64 "\n", temp);
     //print_binary(temp); 
@@ -362,8 +362,8 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
   printf("\nlength: %d\n", length);
 
   for(i = 0; i < length; i++) {
-    uint64_t temp1 = __bswap_64(a->data[i]);
-    uint64_t temp2 = __bswap_64(b->data[i]);
+    uint64_t temp1 = (a->data[i]);
+    uint64_t temp2 = (b->data[i]);
 
     printf("" "%" PRIu64 , (temp1) );
     if(c == '+') {
@@ -391,7 +391,7 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
   printf("Final length: %d\n", i);
 
   for (int j = 0; j < (int)ap->len; j++) {
-    ap->data[j] = __bswap_64(tempData[j]);
+    ap->data[j] = (tempData[j]);
     //printf("\nResult final: " "%" PRIu64 "\n", ap->data[j] );
   }
 
