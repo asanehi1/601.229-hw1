@@ -244,11 +244,12 @@ char *apint_format_as_hex(const ApInt *ap) {
     hex[0] = '-';
     counter++;
   }
-   //printf("len : %d \n", ap->len);
+   printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
      //printf("%d\n", i);
     uint64_t temp  = (ap->data[i]);
+    remainder = 0;
     // printf("\nin format function: ");
     //printf("\nbefore hex %" PRIu64 "\n", temp);
     //print_binary(temp); 
@@ -256,6 +257,7 @@ char *apint_format_as_hex(const ApInt *ap) {
     if (temp == (uint64_t) 0 && i < (int) ap->len -1) {
       bool = 0;
       temp = 16;
+      printf("bool is trueee \n");
     }
 
     do {
@@ -263,14 +265,18 @@ char *apint_format_as_hex(const ApInt *ap) {
 	temp--;
       } else {
 	// regular code
-	remainder = temp % 16;
+        remainder = temp % 16;
 	//remainder = temp & 15;
 	//printf("rem: %d\n", remainder);
 	temp /= 16;
+	
 	//temp >>= 4;
       }
+      if (counter == 123 || counter == 124 || counter == 125 || counter == 126) {
+	printf("re: %d, temp: %ld \n", remainder, temp);
+      }
       hex[counter++] =  get_hex_char(remainder);
-      //printf("re: %d", hex[counter - 1]);
+      printf("#: %d, hex: %c \n", counter - 1, hex[counter - 1]);
     } while ((int) temp != 0);
     //free(temp);
   }
@@ -278,21 +284,9 @@ char *apint_format_as_hex(const ApInt *ap) {
   
   hex = swap_hex_values(hex);
   printf("hex: %s\n", hex);
-  /**
 
-  if(ap->flags == 1) {
-    char* neg = (char*) calloc(1, sizeof(hex) + 1);
-    neg[0] = '-';
-    //printf("this is neg\n");
-    strncat(neg, hex, 16);
-     free(hex);
-     //printf("after : %s \n", neg);
-     return neg;
-    }
-  **/
   return hex;
 }
-
 
 ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
@@ -413,7 +407,7 @@ int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
-  int alength = a->len-1;
+  int len = get_length(a, b) - 1;
   //newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
   
   if (a->flags == 0 && b->flags == 0) {
@@ -428,17 +422,36 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
     //result = unsigned_add(a->data[0], b->data[0]);
     newApInt = unsigned_add(a, b, '+');
     newApInt->flags = 1;
-  } else if (a->data[0] < b->data[0] && a->flags == 1) {
+  } else if (a->len > b-> len && a->flags == 0) {
+    // a > b  (a is pos and b is neg )
+    newApInt = unsigned_add(a, b, '-');
+    newApInt->flags = 0;
+  } else if (b -> len > a->len && b->flags == 1) {
+    // |b| > |a| but a > b  (b is negative)
+    newApInt = unsigned_add(b, a, '-');
+    newApInt->flags = 1;
+
+  } else if (a->len > b->len && a->flags == 1) {
+      // |a| > |b| but b > a
+    newApInt = unsigned_add(a, b, '-');
+    newApInt->flags = 1;
+
+   } else if (b->len > a->len && a->flags == 0) {
+    // |b| > |a| but a > b since a is pos b is neg
+    newApInt = unsigned_add(b, a, '-');
+    newApInt->flags = 0;
+    
+  } else if (a->data[len] < b->data[len] && a->flags == 1) {
     // a < b and a is negative and b is positive
     //result = unsigned_sub(b->data[0], a->data[0]);
     newApInt = unsigned_add(b, a, '-');
     newApInt->flags = 0;
-  }  else if (a->data[0] < b->data[0]) {
+  }  else if (a->data[len] < b->data[len]) {
     // a < b and a is positive while b is neg
     //result = unsigned_sub(b->data[0], a->data[0]);
     newApInt = unsigned_add(b, a, '-');
     newApInt->flags = 1;
-  } else if (a->data[0] > b->data[0] && a->flags == 1) {
+  } else if (a->data[len] > b->data[len] && a->flags == 1) {
      // a > b and a is neg  while b is pos
     //result = unsigned_sub(a->data[0], b->data[0]);
     newApInt = unsigned_add(a, b, '-');
