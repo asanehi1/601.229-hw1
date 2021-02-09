@@ -381,6 +381,7 @@ void unsigned_add(const ApInt* a, const ApInt* b, ApInt* ap, char c) {
 
   for (int j = 0; j < (int)ap->len; j++) {
     ap->data[j] = tempData[j];
+    
   }
   //printf("\nResult final: " "%" PRIu64 "\n", ap->data[0] );
   free(tempData);
