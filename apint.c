@@ -319,14 +319,14 @@ void unsigned_add(const ApInt* a, const ApInt* b, ApInt* ap) {
   printf("lenth: %d\n", length);
 
   for(i = 0; i < length; i++) {
-    uint64_t temp1 = a->data[i];
-    uint64_t temp2 = b->data[i];
+    uint64_t temp1 = __bswap_64(a->data[i]);
+    uint64_t temp2 = __bswap_64(b->data[i]);
 
     carryOut = add_overflow(temp1, temp2, carryIn); //carryIn = 0 carryOut = 1  carryIn = 1 carryOut = 1
-    ap->data[i] = temp1 + temp2 + carryIn;          //carryIn = 0               carryIn = 1
+    ap->data[i] = (temp1 + temp2 + carryIn);          //carryIn = 0               carryIn = 1
     carryIn = carryOut;                             //carryIn = 1               carryIn = 1
-    printf("data1: " "%" PRIu64 , temp1 );
-    printf(" + data2 : " "%" PRIu64 , b->data[i] );
+    printf("data1: " "%" PRIu64 , (temp1) );
+    printf(" + data2 : " "%" PRIu64 "\n" , temp2 );
     printf("\nResult: \n" "%" PRIu64 "\n", ap->data[i] );
   }
 
@@ -335,8 +335,8 @@ void unsigned_add(const ApInt* a, const ApInt* b, ApInt* ap) {
   }
 
   ap->len = i;
+  //printf("\nResult final: \n" "%" PRIu64 "\n", ap->data[0] );
   print_binary(ap);
-  //printf("final lenth: %d\n" "%" PRIu64 "\n", ap->len);
   
 }
 
