@@ -42,7 +42,8 @@ ApInt *apint_create_from_hex(const char *hex) {
     // help count leading zeros
       counter++;
   }
-  if (counter == strlen(hex)) {
+  if (counter == (int) strlen(hex)) {
+    // if its just 0
     counter--;
   }
   //printf("%d \n", counter);
@@ -54,19 +55,23 @@ ApInt *apint_create_from_hex(const char *hex) {
   int n = (strlen(hex) - counter) / 16 + extra;
   //printf("%d \n", n);
 
-   newApInt->data = (uint64_t*)malloc(n * sizeof(uint64_t));
+   newApInt->data = (uint64_t*) malloc(n * sizeof(uint64_t));
    newApInt->len = n;
 
-  int digitLeft = 16;
+  int digitLeft = 16; 
   for (int i = 0; i < n; i++) {
-    char * temp = (char*) malloc( sizeof(char) * 17);
+    char * temp = (char*) calloc(17,  sizeof(char));
+    /**
     if (i == n - 1) {
-      digitLeft == (strlen(hex) - counter) % 16;
+      //digitLeft = (strlen(hex)- counter) % 16;
+      //counter = strlen(hex) - digitLeft;
     }
+    **/
     strncpy(temp, hex + counter, digitLeft);
-    //printf("hi: %s \n", temp);
+    // printf("hi: %s \n", temp);
     newApInt->data[i] =  __bswap_64(strtoull(temp, NULL,  16));
     counter += 16;
+    free(temp);
   }
     
 
@@ -80,7 +85,10 @@ ApInt *apint_create_from_hex(const char *hex) {
 
 /* Deallocates the memory used by the ApInt instance pointed-to by the ap parameter */
 void apint_destroy(ApInt *ap) {
-  free(ap->data);
+  //for (int i = 0; i < ap->len; i++) {
+   free(ap->data);
+  
+  
   free(ap);
 }
 
@@ -105,6 +113,7 @@ int apint_is_negative(const ApInt *ap) {
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
   uint64_t temp = __bswap_64(ap->data[n]);
+  //printf("value: %" PRIu64, temp);
   //uint64_t temp = (ap->data[n]);
   return  temp;
 }
@@ -115,7 +124,7 @@ int apint_highest_bit_set(const ApInt *ap) {
   // I think largest value is stored in data[0]
   uint64_t temp = __bswap_64(ap->data[n]);
   //uint64_t temp = (ap->data[0]);
-  if (temp == (uint64_t) 0) {
+  if (temp == (uint64_t) 0 && n == 0) {
     return -1;
   }
   // highet bit stores the value of highest bit
@@ -161,7 +170,7 @@ char * swap_hex_values(char *hex) {
   int start = 0;
   if (hex[0] == '-') {
     start = 1;
-    printf("neg");
+    //printf("neg");
   }
   while (start < end) {
     char temp = hex[start];
@@ -191,19 +200,23 @@ void print_binary(uint64_t w) {
 }
 
 char *apint_format_as_hex(const ApInt *ap) {
-  char* hex = (char*) malloc((int)ap->len * sizeof(char) * 17);
+  char* hex = (char*) calloc((int) ap->len,  sizeof(char) * 17 + 1);
   int counter = 0;
-   int remainder = 0;
+  int remainder = 0;
 
+  if (ap->flags == 1) {
+    hex[0] = '-';
+    counter++;
+  }
    //printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
-    uint64_t temp = __bswap_64(ap->data[i]);
+    uint64_t temp  = __bswap_64(ap->data[i]);
     // printf("\nin format function: ");
     //printf("before %" PRIu64 "\n", temp);
     //print_binary(temp); 
     int bool = 1;
-    if (temp == (uint64_t) 0 && i < ap->len -1) {
+    if (temp == (uint64_t) 0 && i < (int) ap->len -1) {
       bool = 0;
       temp = 16;
     }
@@ -222,13 +235,15 @@ char *apint_format_as_hex(const ApInt *ap) {
       hex[counter++] =  get_hex_char(remainder);
       //printf("re: %d", hex[counter - 1]);
     } while ((int) temp != 0);
-    
+    //free(temp);
   }
   
   
   hex = swap_hex_values(hex);
+  /**
+
   if(ap->flags == 1) {
-    char* neg = (char*) malloc((int)ap->len * sizeof(char) * 17);
+    char* neg = (char*) calloc(1, sizeof(hex) + 1);
     neg[0] = '-';
     //printf("this is neg\n");
     strncat(neg, hex, 16);
@@ -236,14 +251,17 @@ char *apint_format_as_hex(const ApInt *ap) {
      //printf("after : %s \n", neg);
      return neg;
     }
+  **/
   return hex;
 }
 
 ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
-  newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
-  newApInt->data[0] = ap->data[0];
+  newApInt->data = (uint64_t*)malloc((int) ap->len * sizeof(uint64_t));
+  for (int i = 0; i < ap->len; i++) {
+    newApInt->data[i] = ap->data[i];
+  }
 
   if (ap->data[0] == 0) {
     return newApInt;

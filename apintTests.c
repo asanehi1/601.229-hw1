@@ -84,7 +84,7 @@ TestObjs *setup(void) {
 	/* TODO: initialize additional members of test fixture */
 
 	objs->minus110660361 = apint_negate(objs->ap110660361);
-	//objs->large = apint_createFrom;
+	objs->large = apint_create_from_hex("10000000000000000");
  
 	return objs;
 }
@@ -97,7 +97,7 @@ void cleanup(TestObjs *objs) {
   apint_destroy(objs->minus1);
   apint_destroy(objs->minus110660361);
 	/* TODO: destroy additional members of test fixture */
-
+  apint_destroy(objs->large);
 	free(objs);
 }
 
@@ -155,12 +155,16 @@ void testCompare(TestObjs *objs) {
 }
 
 void testFormatAsHex(TestObjs *objs) {
+  ApInt *ap;
 	char *s;
 
         ASSERT(0 == strcmp("0", (s = apint_format_as_hex(objs->ap0))));
 	free(s);
 
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(objs->ap1))));
+	free(s);
+
+	ASSERT(0 == strcmp("-1", (s = apint_format_as_hex(objs->minus1))));
 	free(s);
 
 	ASSERT(0 == strcmp("6988b09", (s = apint_format_as_hex(objs->ap110660361))));
@@ -172,8 +176,17 @@ void testFormatAsHex(TestObjs *objs) {
 	ASSERT(0 == strcmp("-6988b09", (s = apint_format_as_hex(objs->minus110660361))));
 	free(s);
 
-	ASSERT(0 == strcmp("-ffffffffffffffff", (s = apint_format_as_hex(apint_negate(objs->max1)))));
+	ap = apint_negate(objs->max1);
+	ASSERT(0 == strcmp("-ffffffffffffffff", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
 	free(s);
+
+
+	/**
+	ASSERT(0 == strcmp("10000000000000000", (s = apint_format_as_hex(objs->large))));
+	free(s);
+	**/
+
 	
 }
 
@@ -429,33 +442,42 @@ void testCreateFromHex (TestObjs *objs) {
 
 	ap = apint_create_from_hex("0");
 	ASSERT(0UL == apint_get_bits(ap, 0));
-	free(ap);
+	apint_destroy(ap);
 
 	ap = apint_create_from_hex("00000000000");
 	ASSERT(0UL == apint_get_bits(ap, 0));
-	free(ap);
+	apint_destroy(ap);
 
 	ap = apint_create_from_hex("-1");
 	ASSERT(1UL == apint_get_bits(ap, 0));
 	ASSERT(ap->flags == 1);
-	free(ap);
-
+	apint_destroy(ap);
+	
 	ap = apint_create_from_hex("6988b09");
 	ASSERT(110660361UL == apint_get_bits(ap, 0));
-	free(ap);
+	apint_destroy(ap);
 
 	ap = apint_create_from_hex("ffffffffffffffff");
 	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
-	free(ap);
+         apint_destroy(ap);
 
 	ap = apint_create_from_hex("FFFFFFFFFFFFFFFF");
 	ASSERT(0xFFFFFFFFFFFFFFFFUL == apint_get_bits(ap, 0));
-	free(ap);
+        apint_destroy(ap);
+
 
 	ap = apint_create_from_hex("-00000000006988b09");
 	ASSERT(110660361UL == apint_get_bits(ap, 0));
 	ASSERT(ap->flags == 1);
+        apint_destroy(ap);
+
+
+	/**
+	ap = apint_create_from_hex("10000000000000000");
+	ASSERT(0UL == apint_get_bits(ap, 0));
+	ASSERT(1UL == apint_get_bits(ap, 1));
 	free(ap);
+	**/
 
 
 }
