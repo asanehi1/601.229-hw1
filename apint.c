@@ -354,14 +354,14 @@ int get_length(const ApInt* a, const ApInt* b) {
 }
 
 ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
-  int carryIn = 0, i, carryOut = 0;
+  int carryIn = 0, i = 0, carryOut = 0, borrow;
   int length = get_length(a,b);
 
   ApInt * ap = (ApInt*)malloc(sizeof(ApInt));
   uint64_t* tempData = (uint64_t*)malloc(sizeof(uint64_t) * length);
   printf("\nlength: %d\n", length);
 
-  for(i = 0; i < length; i++) {
+  for(; i < length; i++) {
     uint64_t temp1 = (a->data[i]);
     uint64_t temp2 = (b->data[i]);
 
@@ -369,16 +369,13 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
     if(c == '+') {
       carryOut = add_overflow(temp1, temp2, carryIn); //carryIn = 0 carryOut = 1  carryIn = 1 carryOut = 1
       tempData[i]= (temp1 + temp2 + carryIn);          //carryIn = 0               carryIn = 1
-      //carryIn = carryOut;                             //carryIn = 1               carryIn = 1
+      carryIn = carryOut;                             //carryIn = 1               carryIn = 1
       printf(" + " "%" PRIu64 , temp2 );
     } else {
       tempData[i]= temp1 - temp2;
       printf(" - " "%" PRIu64 , temp2 );
     }
-    printf(" + %d", carryIn);
-    printf(" = " "%" PRIu64 "\n",tempData[i] );
-    printf("CarryOut: %d\n", carryOut);
-    carryIn = carryOut;   
+    printf(" = " "%" PRIu64 "\n",tempData[i] ); 
   }
 
   //2 0000 0000 0000 0000
@@ -406,7 +403,7 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
 }
 
 int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
-  if((temp1 + temp2 + carry) < temp1 || (temp1 + temp2 + carry) < temp2) {
+  if(temp1) {
     printf("\nOverflow\n");
     return 1;
   } else {
@@ -416,6 +413,7 @@ int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
+  int alength = a->len-1;
   //newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
   
   if (a->flags == 0 && b->flags == 0) {
@@ -488,12 +486,14 @@ ApInt *apint_sub(const ApInt *a, const ApInt *b) {
     newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
     newApInt->data[0] = 0; 
     newApInt->flags = 0;
+    newApInt->len = 1;
   } else {
     //result = a->data[0] * 2;
     newApInt = (ApInt*)malloc(sizeof(ApInt));
     newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
     newApInt->data[0] = a->data[0] * 2;
     newApInt->flags = a->flags;
+    newApInt->len = 1;
   }
   
 

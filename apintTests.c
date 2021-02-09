@@ -12,6 +12,12 @@
  * - etc.
  */
 
+
+//1000
+//1000 +
+//-------
+//2000
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -335,14 +341,38 @@ void testAdd(TestObjs *objs) {
 	sum = apint_add(objs->large, objs->large);
 	ASSERT(0 == strcmp("20000000000000000", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
+	free(s);
+
+	printf("yo--------------");
+
+	a = apint_create_from_hex("ffffffffffffffffffffffffffffffff");
+	b = apint_create_from_hex("1");
+	sum = apint_add(a, b);
+	s = apint_format_as_hex(sum);
+	printf("string: %s\n", s);
+	ASSERT(0 == strcmp("100000000000000000000000000000000", s));
+	apint_destroy(sum);
 	apint_destroy(b);
 	apint_destroy(a);
 	free(s);
 
-	a = apint_create_from_hex("ffffffffffffffffffffffffffffffff");
+	a = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 	b = apint_create_from_hex("1");
-	sum = apint_add(objs->large, objs->large);
-	ASSERT(0 == strcmp("100000000000000000000000000000000", (s = apint_format_as_hex(sum))));
+	sum = apint_add(a, b);
+	s = apint_format_as_hex(sum);
+	printf("string: %s\n", s);
+	ASSERT(0 == strcmp("10000000000000000000000000000000000000000000000000000000000000000", s));
+	apint_destroy(sum);
+	apint_destroy(b);
+	apint_destroy(a);
+	free(s);
+
+	a = apint_create_from_hex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffb");
+	b = apint_create_from_hex("4");
+	sum = apint_add(a, b);
+	s = apint_format_as_hex(sum);
+	printf("string: %s\n", s);
+	ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", s));
 	apint_destroy(sum);
 	apint_destroy(b);
 	apint_destroy(a);
@@ -367,16 +397,12 @@ void testSub(TestObjs *objs) {
 	apint_destroy(diff);
 	free(s);
 
-	printf("---------------\n");
-
 	/* subtracting 1 from 1 is 0 */
 	diff = apint_sub(objs->ap1, objs->ap1);
 	ASSERT(0 == strcmp("0", (s = apint_format_as_hex(diff))));
 	ASSERT(0 == apint_compare(diff, objs->ap0));
 	apint_destroy(diff);
 	free(s);
-
-	printf("1---------------\n");
 
 	/* subtracting 1 from 0 is -1 */
 	diff = apint_sub(objs->ap0, objs->ap1);
