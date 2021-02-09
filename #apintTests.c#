@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	/* TODO: use TEST macro to execute more test functions */
 	TEST(testIsNegative);
 	TEST(testIsZero);
-	TEST(basicAdd);
+	//TEST(basicAdd);
 	//TEST(basicSub);
 	TEST(testCreateFromHex);
 	TEST_FINI();
@@ -123,6 +123,7 @@ void testHighestBitSet(TestObjs *objs) {
 	ASSERT(0 == apint_highest_bit_set(objs->ap1));
 	ASSERT(26 == apint_highest_bit_set(objs->ap110660361));
 	ASSERT(63 == apint_highest_bit_set(objs->max1));
+	ASSERT(64 == apint_highest_bit_set(
 }
 
 void testCompare(TestObjs *objs) {
@@ -230,8 +231,6 @@ void testFormatAsHex(TestObjs *objs) {
 	
 }
 
-
-
 void testAdd(TestObjs *objs) {
 	ApInt *sum;
 	char *s;
@@ -243,7 +242,7 @@ void testAdd(TestObjs *objs) {
 	free(s);
 
 	/* 1 + 0 = 1 */
-    sum = apint_add(objs->ap1, objs->ap0);
+       	sum = apint_add(objs->ap1, objs->ap0);
 	ASSERT(0 == strcmp("1", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
 	free(s);
@@ -255,7 +254,7 @@ void testAdd(TestObjs *objs) {
 	free(s);
 	
 
-	// /* 110660361 + 1 = 110660362 */
+	/* 110660361 + 1 = 110660362 */
 	sum = apint_add(objs->ap110660361, objs->ap1);
 	ASSERT(0 == strcmp("6988b0a", (s = apint_format_as_hex(sum))));
 	apint_destroy(sum);
@@ -380,7 +379,6 @@ void basicAdd(TestObjs *objs) {
 	
 
 	/* -1 + 1 = 0 */
-	printf("hello\n");
 	sum = apint_add(objs->minus1, objs->ap1);
 	ASSERT(0 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 0);
@@ -413,11 +411,6 @@ void basicAdd(TestObjs *objs) {
        	/* -110660361 + 0  = -110660361 */
 	sum = apint_add(objs->minus110660361, objs->ap0);
 	ASSERT(110660361 == apint_get_bits(sum, 0));
-	ASSERT(sum->flags == 1);
-	apint_destroy(sum);
-
-	sum = apint_add(objs->max1, objs->ap1);
-	ASSERT(1 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
 
@@ -482,7 +475,7 @@ void basicSub(TestObjs *objs) {
 	ASSERT(110660361 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
-	
+
 }
 
 void testCreateFromHex (TestObjs *objs) {
@@ -563,3 +556,5 @@ void testCreateFromHex (TestObjs *objs) {
 
 
 }
+
+/* TODO: add more test functions */

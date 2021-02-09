@@ -34,10 +34,19 @@ ApInt *apint_create_from_hex(const char *hex) {
   int counter = 0;
   if(hex[0] == '-') {
     newApInt->flags = 1;
+    //printf("this is neg \n");
     counter++;
   } else {
     newApInt->flags = 0;
   }
+
+  if (hex[0] == '-' && strlen(hex) == 1) {
+    newApInt->data = (uint64_t*) malloc(sizeof(uint64_t));
+    newApInt->data[0] = 0;
+    newApInt->len = 1;
+    return newApInt;
+  }
+  
   while (hex[counter] == '0' && strlen(hex) > 1) {
     // help count leading zeros
       counter++;
@@ -45,6 +54,7 @@ ApInt *apint_create_from_hex(const char *hex) {
   if (counter == (int) strlen(hex)) {
     // if its just 0
     counter--;
+    newApInt->flags = 0;
   }
   //printf("%d \n", counter);
 
@@ -53,33 +63,52 @@ ApInt *apint_create_from_hex(const char *hex) {
     extra = 1;
   }
   int n = (strlen(hex) - counter) / 16 + extra;
-  //printf("%d \n", n);
+  //printf("length: %d \n", n);
 
    newApInt->data = (uint64_t*) malloc(n * sizeof(uint64_t));
    newApInt->len = n;
 
-  int digitLeft = 16; 
+   int num = strlen(hex) - counter;
+
+  int digitLeft = 16;
+  //printf("num: %d \n ", num);
+  int countDigits;
+  if (n > 1) {
+    countDigits = 16;
+  } else {
+    countDigits = num % 16;
+  }
+  int digitsFromLeft = num - countDigits + counter;
+
+  //char *tempH = (char *) calloc(1, sizeof(hex));
+  //tempH = swap_hex_values(hex);
   for (int i = 0; i < n; i++) {
     char * temp = (char*) calloc(17,  sizeof(char));
-    /**
+ 
     if (i == n - 1) {
+      digitsFromLeft = counter % 17;
+      digitLeft =  num % 16 + 16 * (1- 1 * extra);
+      //digitLeft = num % 16 - counter ;
       //digitLeft = (strlen(hex)- counter) % 16;
       //counter = strlen(hex) - digitLeft;
     }
-    **/
-    strncpy(temp, hex + counter, digitLeft);
-    // printf("hi: %s \n", temp);
-    newApInt->data[i] =  __bswap_64(strtoull(temp, NULL,  16));
-    counter += 16;
+    strncpy(temp, hex + digitsFromLeft, digitLeft);
+    //printf("digitsFromLeft %d \n", digitsFromLeft);
+    //printf("digitLeft %d \n", digitLeft);
+    //printf("string: %s \n", hex);
+    //printf("hi: %s \n", temp);
+    newApInt->data[i] = __bswap_64(strtoull(temp, NULL,  16));
+    //counter += 16;
+    digitsFromLeft -= 16;
     free(temp);
   }
     
 
-
+  //printf("\n");
   //printf("final  %" PRIu64 "\n", __bswap_64(newApInt->data[0]));
   return newApInt;
 }
-  
+
 
     
 
@@ -140,6 +169,7 @@ int apint_highest_bit_set(const ApInt *ap) {
   }
   return highestBit + (n * 64);
 }
+
 
 
 char get_hex_char(int num) {
@@ -258,6 +288,7 @@ char *apint_format_as_hex(const ApInt *ap) {
   return hex;
 }
 
+
 ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
@@ -266,16 +297,17 @@ ApInt *apint_negate(const ApInt *ap) {
     newApInt->data[i] = ap->data[i];
   }
 
-  if (ap->data[0] == 0) {
+  if (ap->data[0] == 0 && ap->len == 1) {
     return newApInt;
-  } else if(ap->flags == 0) {
-    newApInt->flags = 1;
-  } else {
+  } else if(ap->flags == 1) {
     newApInt->flags = 0;
+  } else {
+    newApInt->flags = 1;
   }
   // apint_destroy(ap);
   return newApInt;
 }
+
 
 int get_hex_num(char c) {
   switch(tolower(c)) {
