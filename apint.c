@@ -245,7 +245,8 @@ ApInt *apint_negate(const ApInt *ap) {
   } else {
     newApInt->flags = 1;
   }
-  // apint_destroy(ap);
+
+  //apint_destroy(ap);
   return newApInt;
 }
 
@@ -406,7 +407,9 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
-  newApInt = apint_add(a, apint_negate(b));
+  ApInt * newB = apint_negate(b);
+  newApInt = apint_add(a,newB);
+  apint_destroy(newB);
   
   return newApInt;
 }
