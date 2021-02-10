@@ -128,6 +128,7 @@ void testHighestBitSet(TestObjs *objs) {
 	ASSERT(0 == apint_highest_bit_set(objs->ap1));
 	ASSERT(26 == apint_highest_bit_set(objs->ap110660361));
 	ASSERT(63 == apint_highest_bit_set(objs->max1));
+       	ASSERT(64 == apint_highest_bit_set(objs->large));
 }
 
 void testCompare(TestObjs *objs) {
@@ -153,8 +154,27 @@ void testCompare(TestObjs *objs) {
        	ASSERT(apint_compare(objs->minus1, objs->minus110660361) > 0);
 	
 	// compare large numbers
-	ApInt *sum = apint_add(objs->max1, objs->ap1);
-	ASSERT(apint_compare(sum, objs->ap0) > 0);
+	ASSERT(apint_compare(objs->large, objs->ap0) > 0);
+        ASSERT(apint_compare(objs->ap0, objs->large) < 0);
+
+	sum = apint_add(objs->large, objs->large);
+	ap = apint_negate(sum);
+	// large < larger
+	ASSERT(apint_compare(objs->large, sum) < 0);
+	// large = large
+	ASSERT(apint_compare(objs->large, objs->large) == 0);
+	// larger > large
+	ASSERT(apint_compare(sum, objs->large) > 0);
+	// -larger < 0
+	ASSERT(apint_compare(ap, objs->ap0) < 0);
+	// large > - larger
+	ASSERT(apint_compare(objs->large, ap) > 0);
+	// -larger < large
+	ASSERT(apint_compare(ap, objs->large) < 0);
+	apint_destroy(sum);
+
+	apint_destroy(ap);
+
 	  
 	
 }
