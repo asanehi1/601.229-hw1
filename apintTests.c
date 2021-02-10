@@ -461,7 +461,7 @@ void testAdd(TestObjs *objs) {
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
     ASSERT(0 == strcmp("100000000000000000000000000000000fffffffffffffffe", s));
-    ASSERT(0 == strcmp("", s));
+    //ASSERT(0 == strcmp("", s));
     apint_destroy(sum);
     apint_destroy(b);
     apint_destroy(a);

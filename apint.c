@@ -301,6 +301,8 @@ int add_overflow(uint64_t temp1, uint64_t temp2, int carry) {
   if((temp1 + temp2 + carry) < temp1 || (temp1 + temp2 + carry) < temp2) {
     printf("\nOverflow\n");
     return 1;
+  } else if (temp1 == UINT64_MAX && temp2 == UINT64_MAX && carry == 1) {
+    return 1;
   } else {
     return 0;
   }
@@ -326,13 +328,15 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
     uint64_t temp1;
     uint64_t temp2;
 
-    if(a->len < i - 1) {
+    if(a->len < i + 1) {
       temp1 = 0UL;
       temp2 = (b->data[i]);
-    } else if (b->len < i - 1) {
+    } else if (b->len < i + 1) {
       temp2 = 0UL;
       temp1 = (a->data[i]);
-    } else {
+    } 
+    //else if(a->len > i && b->len > i) {
+      else {
       temp1 = (a->data[i]);
       temp2 = (b->data[i]);
     }
@@ -340,16 +344,19 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
     printf("" "%" PRIu64 , (temp1) );
     if(c == '+') {
       carryOut = add_overflow(temp1, temp2, carryIn); 
+      printf("\nCarryIn: %d\n", carryIn);
       tempData[i]= (temp1 + temp2 + carryIn);     
-      carryIn = carryOut;                            
+      carryIn = carryOut;  
+      printf("CarryOut: %d\n", carryOut);                          
       printf(" + " "%" PRIu64 , temp2 );
     } else {
       carryOut = sub_underflow(temp1, temp2, carryIn);
       tempData[i] = temp1 - carryIn - temp2;
       carryIn = carryOut;  
-       printf(" - " "%" PRIu64 , temp2 );
+      printf(" - " "%" PRIu64 , temp2 );
     }
-    printf(" = " "%" PRIu64 "\n",tempData[i] ); 
+    printf(" = " "%x" PRIu64 "\n",tempData[i] ); 
+    
   }
 
   if (carryIn > 0) {
@@ -383,7 +390,7 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
 
 int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
   if(temp1 < temp2 + carry) {
-    printf("\nOverflow\n");
+    printf("\nUnderflow\n");
     return 1;
   } else {
     return 0;
@@ -426,6 +433,9 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
     newApInt = unsigned_add(b, a, '-');
     newApInt->flags = 0;
     
+  } else if (b->len > a->len && a->flags == 1) {
+    newApInt = unsigned_add(b, a, '-');
+    newApInt->flags = 0;
   } else if (a->data[len] < b->data[len] && a->flags == 1) {
     // a < b and a is negative and b is positive
     //result = unsigned_sub(b->data[0], a->data[0]);
