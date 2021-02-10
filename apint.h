@@ -39,12 +39,10 @@ ApInt *apint_negate(const ApInt *ap);
 ApInt *apint_add(const ApInt *a, const ApInt *b);
 ApInt *apint_sub(const ApInt *a, const ApInt *b);
 int apint_compare(const ApInt *left, const ApInt *right);
-void print_binary(ApInt* n);
+int sub_underflow(uint64_t temp1, uint64_t temp2, int carry);
+int add_overflow(uint64_t temp1, uint64_t temp2, int carry);
   char get_hex_char(int num);
-  int apint_to_hex_calculations(int pos);
-  //uint64_t unsigned_add(const uint64_t a, const uint64_t b);
-  //uint64_t unsigned_sub(const uint64_t a, const uint64_t b);
-   ApInt *apint_add_n(const ApInt *a, const ApInt *b, const int n, const int overflow);
+  ApInt* unsigned_calc(const ApInt* a, const ApInt* b, char c);
   int  get_int_from_hex(char hex);
   
 #ifdef __cplusplus

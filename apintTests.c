@@ -109,8 +109,6 @@ void cleanup(TestObjs *objs) {
 }
 
 void testCreateFromU64(TestObjs *objs) {
-  //uint64_t temp = apint_get_bits(objs->ap1, 0);
-  //printf("final " "%" PRIu64 "\n", temp);
   ASSERT(0UL == apint_get_bits(objs->ap0, 0));
 
   ASSERT(1UL == apint_get_bits(objs->ap1, 0));
@@ -348,7 +346,6 @@ void testAdd(TestObjs *objs) {
 
     /* FFFFFFFFFFFFFFFF + 0 */
     sum = apint_add(objs->max1, objs->ap0);
-    //printf("%s \n", apint_format_as_hex(sum));
     ASSERT(0 == strcmp("ffffffffffffffff", (s = apint_format_as_hex(sum))));
     apint_destroy(sum);
     free(s);
@@ -357,9 +354,6 @@ void testAdd(TestObjs *objs) {
     /* FFFFFFFFFFFFFFFF + 1 = 10000000000000000 */
     sum = apint_add(objs->max1, objs->ap1);
     ASSERT(0 == strcmp("10000000000000000", (s = apint_format_as_hex(sum))));
-    //  printf("data[0]:" PRIu64 "\n", sum->data[0]);
-    //  printf("data[1]:" PRIu64 "\n", sum->data[1]);
-    
     apint_destroy(sum);
     free(s);
 
@@ -378,29 +372,16 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("1");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("100000000000000000000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
     apint_destroy(a);
     free(s);
 
-    // a = apint_create_from_hex("              193abd5f2ba62791063bad");
-    // b = apint_create_from_hex("189073badc26db28ba910a628b7db2a8d390");
-    // sum = apint_add(a, b);
-    // s = apint_format_as_hex(sum);
-    // printf("string: %s\n", s);
-    // ASSERT(0 == strcmp("3d", s));
-    // apint_destroy(sum);
-    // apint_destroy(b);
-    // apint_destroy(a);
-    // free(s);
-
     a = apint_create_from_hex("000000000000000000000000");
     b = apint_create_from_hex("0000000000000000");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("0", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -411,44 +392,27 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("1");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("10000000000000000000000000000000000000000000000000000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
     apint_destroy(a);
     free(s);
 
-    // a = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-    // b = apint_create_from_hex("1");
-    // sum = apint_add(a, b);
-    // s = apint_format_as_hex(sum);
-    // printf("string: %s\n", s);
-    // ASSERT(0 == strcmp("10000000000000000000000000000000000000000000000000000000000000000", s));
-    // apint_destroy(sum);
-    // apint_destroy(b);
-    // apint_destroy(a);
-    // free(s);
-
     a = apint_create_from_hex("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffb");
     b = apint_create_from_hex("4");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", s));
     apint_destroy(sum);
     apint_destroy(b);
     apint_destroy(a);
     free(s);
 
-	//6277101735386680763835789423207666416102355444464034512895
-	//18446744073709551615
-
 	// case 1) a has 1 uint64_t, b has 3 uint64_t. a is positive, b is positive
 	a = apint_create_from_hex("ffffffffffffffff");
     b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("100000000000000000000000000000000fffffffffffffffe", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -472,7 +436,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffff0000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -484,7 +447,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("-ffffffffffffffffffffffffffffffff0000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -495,7 +457,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
      ASSERT(0 == strcmp("-100000000000000000000000000000000fffffffffffffffe", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -507,7 +468,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("-ffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffff0000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -518,7 +478,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("-ffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("-100000000000000000000000000000000fffffffffffffffe", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -530,7 +489,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("ffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("-ffffffffffffffffffffffffffffffff0000000000000000", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -542,7 +500,6 @@ void testAdd(TestObjs *objs) {
     b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
     sum = apint_add(a, b);
     s = apint_format_as_hex(sum);
-    printf("string: %s\n", s);
     ASSERT(0 == strcmp("1fffffffffffffffffffffffffffffffffffffffffffffffe", s));
     apint_destroy(sum);
     apint_destroy(b);
@@ -589,7 +546,6 @@ void testSub(TestObjs *objs) {
 	b = apint_create_from_hex("9fa0fb165441ade7cb8b17c3ab3653465e09e8078e09631ec8f6fe3a5b301dc");
 	diff = apint_sub(a, b);
 	(s = apint_format_as_hex(diff));
-	printf("string: %s\n", s);
 	ASSERT(0 == strcmp("7e35207519b6afc4883c6fdd8898213a367d73b918de95f20766963b0251c622cd3ec4633b691", s));
 	apint_destroy(diff);
 	apint_destroy(b);
@@ -648,7 +604,6 @@ void basicAdd(TestObjs *objs) {
 	
 
 	/* -1 + 1 = 0 */
-	printf("hello\n");
 	sum = apint_add(objs->minus1, objs->ap1);
 	ASSERT(0 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 0);
@@ -683,11 +638,6 @@ void basicAdd(TestObjs *objs) {
 	ASSERT(110660361 == apint_get_bits(sum, 0));
 	ASSERT(sum->flags == 1);
 	apint_destroy(sum);
-
-	// sum = apint_add(objs->max1, objs->ap1);
-	// ASSERT(1 == apint_get_bits(sum, 0));
-	// ASSERT(sum->flags == 1);
-	// apint_destroy(sum);
 
 }
 
