@@ -315,7 +315,7 @@ int get_length(const ApInt* a, const ApInt* b) {
 }
 
 ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
-  int carryIn = 0, i = 0, carryOut = 0, borrow;
+  int carryIn = 0, i = 0, carryOut = 0, borrow = 0;
   int length = get_length(a,b);
 
   ApInt * ap = (ApInt*)malloc(sizeof(ApInt));
@@ -326,51 +326,71 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
     uint64_t temp1 = (a->data[i]);
     uint64_t temp2 = (b->data[i]);
 
+    if(a->len < i) {
+      temp1 = 0UL;
+    } else if (b->len < i) {
+      temp2 = 0UL;
+    }
+
     printf("" "%" PRIu64 , (temp1) );
     if(c == '+') {
-      carryOut = add_overflow(temp1, temp2, carryIn); //carryIn = 0 carryOut = 1  carryIn = 1 carryOut = 1
-      tempData[i]= (temp1 + temp2 + carryIn);          //carryIn = 0               carryIn = 1
-      carryIn = carryOut;                             //carryIn = 1               carryIn = 1
+      carryOut = add_overflow(temp1, temp2, carryIn); 
+      tempData[i]= (temp1 + temp2 + carryIn);     
+      carryIn = carryOut;                            
       printf(" + " "%" PRIu64 , temp2 );
-    } else {
-      tempData[i]= temp1 - temp2;
-      printf(" - " "%" PRIu64 , temp2 );
-    }
+    } 
+    // else {
+    //   carryOut = sub_underflow(temp1, temp2, carryIn);
+    //   tempData[i] = temp1 - carryIn - temp2;
+    //   carryIn = carryOut;  
+    //    printf(" - " "%" PRIu64 , temp2 );
+    // }
     printf(" = " "%" PRIu64 "\n",tempData[i] ); 
   }
 
-  //2 0000 0000 0000 0000
-
   if (carryIn > 0) {
-    tempData[i++] = carryIn;
+    ap->len = i + 1;
+  } else {
+    ap->len = i;
   }
 
-  ap->len = i;
-  ap->data = (uint64_t*)malloc(sizeof(uint64_t) * i);
-  //ap->data = (uint64_t*)realloc(tempData, sizeof(uint64_t) * i);
-  printf("Final length: %d\n", i);
+  ap->data = (uint64_t*)malloc(sizeof(uint64_t) * ap->len);
+  //printf("Final length: %d\n", i);
+
+  //if(carry > 0)
 
   for (int j = 0; j < (int)ap->len; j++) {
-    ap->data[j] = (tempData[j]);
-    //printf("\nResult final: " "%" PRIu64 "\n", ap->data[j] );
+    ap->data[j] = tempData[j];
   }
 
- //print_binary(ap);
-
-  //printf("\nResult final: " "%" PRIu64 "\n", ap->data[0] );
+  if(carryIn > 0) {
+    ap->data[i] = carryIn;
+  }
   
   free(tempData);
   return ap;
 }
 
-int sub_overflow(uint64_t temp1, uint64_t temp2, int carry) {
-  if(temp1) {
-    printf("\nOverflow\n");
-    return 1;
-  } else {
-    return 0;
-  }
-}
+// int sub_borrow(uint64_t* temp1, uint64_t* temp2, int n) {
+//   if(n == strlen(temp1)) {
+//     return -1;
+//   }
+
+//   if(temp1[n] < temp2[n]) {
+//     sub_borrow(temp1, temp2, ++n);
+//   }
+
+//   return 1;
+// }
+
+// int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
+//   if(temp1 < temp2 + carry) {
+//     printf("\nOverflow\n");
+//     return 1;
+//   } else {
+//     return 0;
+//   }
+// }
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
@@ -429,7 +449,6 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
     newApInt = unsigned_add(a, b, '-');
     newApInt->flags = 0;
   } 
-  
 
   // newApInt->data[0] = result;
   return newApInt;
@@ -506,16 +525,16 @@ int apint_compare(const ApInt *left, const ApInt *right) {
   } else if (left->len > right-> len) {
     // left len > right len
     if (left->flags == 0) {
-       	// left is bigger 
-       	return 1;
+        // left is bigger 
+        return 1;
     }
     // right is bigger
     return -1;
   } else {
     // left len < right len
     if (right->flags == 0) {
-      	// right is bigger
-       	return -1;
+        // right is bigger
+        return -1;
     }
     // else left is bigger 
     return 1;
