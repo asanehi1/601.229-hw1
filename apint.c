@@ -463,45 +463,47 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
 }
 
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
-   ApInt * newApInt;
-  if (a->data[0] > b->data[0] && a->flags == b->flags) {
-    //a > b  
-    //result = unsigned_sub(a->data[0], b->data[0]);
-    newApInt = unsigned_add(a, b, '-');
-    // if both positive, sign = positive
-    // if both negative, sign = negative
-    newApInt->flags = a->flags;
-  } else if (a->data[0] > b->data[0]) {
-    // a > b and signs r opposite 
-    //result = unsigned_add(a->data[0], b->data[0]);
-    newApInt = unsigned_add(a, b, '+');
-    newApInt->flags = a->flags;
-  } else if (a->data[0] < b->data[0] && a->flags == b->flags) {
-    //a < b  
-    //result = unsigned_sub(b->data[0], a->data[0]);
-    newApInt = unsigned_add(b, a, '-');
-    // opposite sign
-    newApInt->flags = (a->flags + 1) % 2;
-  } else if (a->data[0] < b->data[0]) {
-    // a > b and signs r opposite 
-    //result = unsigned_add(a->data[0], b->data[0]);
-    newApInt = unsigned_add(a, b, '-');
-    newApInt->flags = a->flags;
-  } else if (apint_compare(a, b) == 0) {
-    //result = 0;
-    newApInt = (ApInt*)malloc(sizeof(ApInt));
-    newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
-    newApInt->data[0] = 0; 
-    newApInt->flags = 0;
-    newApInt->len = 1;
-  } else {
-    //result = a->data[0] * 2;
-    newApInt = (ApInt*)malloc(sizeof(ApInt));
-    newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
-    newApInt->data[0] = a->data[0] * 2;
-    newApInt->flags = a->flags;
-    newApInt->len = 1;
-  }
+  ApInt * newApInt;
+  newApInt = apint_add(a, apint_negate(b));
+  // int len = get_length(a, b) - 1;
+  // if (a->data[0] > b->data[0] && a->flags == b->flags) {
+  //   //a > b  
+  //   //result = unsigned_sub(a->data[0], b->data[0]);
+  //   newApInt = unsigned_add(a, b, '-');
+  //   // if both positive, sign = positive
+  //   // if both negative, sign = negative
+  //   newApInt->flags = a->flags;
+  // } else if (a->data[0] > b->data[0]) {
+  //   // a > b and signs r opposite 
+  //   //result = unsigned_add(a->data[0], b->data[0]);
+  //   newApInt = unsigned_add(a, b, '+');
+  //   newApInt->flags = a->flags;
+  // } else if (a->data[0] < b->data[0] && a->flags == b->flags) {
+  //   //a < b  
+  //   //result = unsigned_sub(b->data[0], a->data[0]);
+  //   newApInt = unsigned_add(b, a, '-');
+  //   // opposite sign
+  //   newApInt->flags = (a->flags + 1) % 2;
+  // } else if (a->data[0] < b->data[0]) {
+  //   // a > b and signs r opposite 
+  //   //result = unsigned_add(a->data[0], b->data[0]);
+  //   newApInt = unsigned_add(a, b, '-');
+  //   newApInt->flags = a->flags;
+  // } else if (apint_compare(a, b) == 0) {
+  //   //result = 0;
+  //   newApInt = (ApInt*)malloc(sizeof(ApInt));
+  //   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  //   newApInt->data[0] = 0; 
+  //   newApInt->flags = 0;
+  //   newApInt->len = 1;
+  // } else {
+  //   //result = a->data[0] * 2;
+  //   newApInt = (ApInt*)malloc(sizeof(ApInt));
+  //   newApInt->data = (uint64_t*)malloc(sizeof(uint64_t));
+  //   newApInt->data[0] = a->data[0] * 2;
+  //   newApInt->flags = a->flags;
+  //   newApInt->len = 1;
+  // }
   
 
   // newApInt->data[0] = result;

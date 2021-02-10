@@ -588,8 +588,9 @@ void testSub(TestObjs *objs) {
 	a = apint_create_from_hex("7e35207519b6b06429378631ca460905c19537644f31dc50114e9dc90bb4e4ebc43cfebe6b86d");
 	b = apint_create_from_hex("9fa0fb165441ade7cb8b17c3ab3653465e09e8078e09631ec8f6fe3a5b301dc");
 	diff = apint_sub(a, b);
-	ASSERT(0 == strcmp("7e35207519b6afc4883c6fdd8898213a367d73b918de95f20766963b0251c622cd3ec4633b691",
-		(s = apint_format_as_hex(diff))));
+	(s = apint_format_as_hex(diff));
+	printf("string: %s\n", s);
+	ASSERT(0 == strcmp("7e35207519b6afc4883c6fdd8898213a367d73b918de95f20766963b0251c622cd3ec4633b691", s));
 	apint_destroy(diff);
 	apint_destroy(b);
 	apint_destroy(a);
