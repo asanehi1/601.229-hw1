@@ -319,17 +319,22 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
   int length = get_length(a,b);
 
   ApInt * ap = (ApInt*)malloc(sizeof(ApInt));
-  uint64_t* tempData = (uint64_t*)malloc(sizeof(uint64_t) * length);
+  uint64_t* tempData = (uint64_t*)malloc(sizeof(uint64_t) * (length + 1));
   printf("\nlength: %d\n", length);
 
   for(; i < length; i++) {
-    uint64_t temp1 = (a->data[i]);
-    uint64_t temp2 = (b->data[i]);
+    uint64_t temp1;
+    uint64_t temp2;
 
-    if(a->len < i) {
+    if(a->len < i - 1) {
       temp1 = 0UL;
-    } else if (b->len < i) {
+      temp2 = (b->data[i]);
+    } else if (b->len < i - 1) {
       temp2 = 0UL;
+      temp1 = (a->data[i]);
+    } else {
+      temp1 = (a->data[i]);
+      temp2 = (b->data[i]);
     }
 
     printf("" "%" PRIu64 , (temp1) );
