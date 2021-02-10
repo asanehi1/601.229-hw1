@@ -439,6 +439,115 @@ void testAdd(TestObjs *objs) {
     apint_destroy(a);
     free(s);
 
+	//6277101735386680763835789423207666416102355444464034512895
+	//18446744073709551615
+
+	// case 1) a has 1 uint64_t, b has 3 uint64_t. a is positive, b is positive
+	a = apint_create_from_hex("ffffffffffffffff");
+    b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("100000000000000000000000000000000fffffffffffffffe", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 2) a has 3 uint64_t, b has 1 uint64_t. a is positive, b is positive
+	a = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    b = apint_create_from_hex("ffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    ASSERT(0 == strcmp("100000000000000000000000000000000fffffffffffffffe", s));
+    ASSERT(0 == strcmp("", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 3) a has 1 uint64_t, b has 3 uint64_t. a is negative, b is positive
+	a = apint_create_from_hex("-ffffffffffffffff");
+    b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffff0000000000000000", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 4) a has 1 uint64_t, b has 3 uint64_t. a is positive, b is negative
+	a = apint_create_from_hex("ffffffffffffffff");
+    b = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("-ffffffffffffffffffffffffffffffff0000000000000000", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	a = apint_create_from_hex("-ffffffffffffffff");
+    b = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+     ASSERT(0 == strcmp("-100000000000000000000000000000000fffffffffffffffe", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 5) a has 3 uint64_t, b has 1 uint64_t. a is positive, b is negative
+	a = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    b = apint_create_from_hex("-ffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffff0000000000000000", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	a = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
+    b = apint_create_from_hex("-ffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("-100000000000000000000000000000000fffffffffffffffe", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 6) a has 3 uint64_t, b has 1 uint64_t. a is positive, b is negative
+	a = apint_create_from_hex("-ffffffffffffffffffffffffffffffffffffffffffffffff");
+    b = apint_create_from_hex("ffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("-ffffffffffffffffffffffffffffffff0000000000000000", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
+	// case 7) a has 3 uint64_t, b has 3 uint64_t. 
+	a = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    b = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffff");
+    sum = apint_add(a, b);
+    s = apint_format_as_hex(sum);
+    printf("string: %s\n", s);
+    ASSERT(0 == strcmp("1fffffffffffffffffffffffffffffffffffffffffffffffe", s));
+    apint_destroy(sum);
+    apint_destroy(b);
+    apint_destroy(a);
+    free(s);
+
 }
 
 
