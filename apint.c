@@ -49,51 +49,51 @@ ApInt *apint_create_from_hex(const char *hex) {
   
   while (hex[counter] == '0' && strlen(hex) > 1) {
     // help count leading zeros
-      counter++;
+    counter++;
   }
 
   if (counter == (int) strlen(hex)) {
-      //if all zeros (so 00000000 turns into 0)
-      counter--;
-      newApInt->flags = 0;
-    }
+    //if all zeros (so 00000000 turns into 0)
+    counter--;
+    newApInt->flags = 0;
+  }
 
   // make new hex without leading zeros and '-'
   char *newHex = (char*) calloc(strlen(hex) - counter,  sizeof(char) + 1);
   strncpy(newHex, hex + counter, strlen(hex) - counter);
   
-
   int is_remainder = 0;
   if (strlen(newHex) % 16 != 0) {
     is_remainder = 1;
   }
+
   int n = strlen(newHex) / 16 + is_remainder;
   // n is ap->len value
   
-   newApInt->data = (uint64_t*) malloc(n * sizeof(uint64_t));
-   newApInt->len = n;
+  newApInt->data = (uint64_t*) malloc(n * sizeof(uint64_t));
+  newApInt->len = n;
 
-   int digitsFromLeft = 0;
-   int digitLeft = strlen(newHex);
-   if (n > 1) {
-     digitsFromLeft = strlen(newHex) - 16;
-     digitLeft = 16;
-   }
+  int digitsFromLeft = 0;
+  int digitLeft = strlen(newHex);
+  if (n > 1) {
+    digitsFromLeft = strlen(newHex) - 16;
+    digitLeft = 16;
+  }
 
-    for (int i = 0; i < n; i++) {
-      // this happens when i = n - 1 usually
-      if (digitsFromLeft < 0) {
-	digitsFromLeft = 0;
-	digitLeft = strlen(newHex) % 16;
-      }
-      
-      char * temp = (char*) calloc(17,  sizeof(char));
-      strncpy(temp, newHex + digitsFromLeft, digitLeft);
-      // strtoull changes hex into uint
-      newApInt->data[i] = (strtoull(temp, NULL,  16));
-      digitsFromLeft -=16;
-      free(temp);
+  for (int i = 0; i < n; i++) {
+    // this happens when i = n - 1 usually
+    if (digitsFromLeft < 0) {
+      digitsFromLeft = 0;
+      digitLeft = strlen(newHex) % 16;
     }
+      
+    char * temp = (char*) calloc(17,  sizeof(char));
+    strncpy(temp, newHex + digitsFromLeft, digitLeft);
+    // strtoull changes hex into uint
+    newApInt->data[i] = (strtoull(temp, NULL,  16));
+    digitsFromLeft -=16;
+    free(temp);
+  }
     
   free(newHex);
   return newApInt;
@@ -156,7 +156,6 @@ int apint_highest_bit_set(const ApInt *ap) {
 }
 
 
-
 char get_hex_char(int num) {
   switch(num) {
     case 0: return '0'; break;
@@ -212,10 +211,8 @@ char *apint_format_as_hex(const ApInt *ap) {
 
     do {
       remainder = temp % 16;
-      //remainder = temp & 15;
       temp /= 16;
       countForPadding++;	
-      //temp >>= 4;
       hex[counter++] =  get_hex_char(remainder);
     } while ((int) temp != 0);  
     
@@ -223,7 +220,6 @@ char *apint_format_as_hex(const ApInt *ap) {
       hex[counter++] = '0';
       countForPadding++;
     }
-   
   }
   
   hex = swap_hex_values(hex);
@@ -234,6 +230,7 @@ ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
   newApInt->data = (uint64_t*)malloc((int) ap->len * sizeof(uint64_t));
+
   for (int i = 0; i < (int) ap->len; i++) {
     newApInt->data[i] = ap->data[i];
   }
@@ -250,7 +247,7 @@ ApInt *apint_negate(const ApInt *ap) {
   return newApInt;
 }
 
-
+/*returns hex number*/
 int get_hex_num(char c) {
   switch(tolower(c)) {
     case '0': return 0; break;
@@ -304,21 +301,23 @@ ApInt* unsigned_calc(const ApInt* a, const ApInt* b, char c) {
     uint64_t temp1;
     uint64_t temp2;
 
-    //length a is 
+    //a has no more values to add
     if((int)a->len < i + 1) {
       temp1 = 0UL;
       temp2 = (b->data[i]);
     } else if ((int)b->len < i + 1) {
+      //b has no more values to add
       temp2 = 0UL;
       temp1 = (a->data[i]);
     } else {
+      //a and b both still have values to add
       temp1 = (a->data[i]);
       temp2 = (b->data[i]);
     }
 
     if(c == '+') {
       carryOut = add_overflow(temp1, temp2, carryIn); 
-      tempData[i]= (temp1 + temp2 + carryIn);     
+      tempData[i]= temp1 + temp2 + carryIn;     
     } else {
       carryOut = sub_underflow(temp1, temp2, carryIn);
       tempData[i] = temp1 - carryIn - temp2;
@@ -342,6 +341,7 @@ ApInt* unsigned_calc(const ApInt* a, const ApInt* b, char c) {
   return ap;
 }
 
+//checks underflow for subtraction
 int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
   if(temp1 < temp2 + carry) {
     return 1;
