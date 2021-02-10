@@ -338,38 +338,31 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
       tempData[i]= (temp1 + temp2 + carryIn);     
       carryIn = carryOut;                            
       printf(" + " "%" PRIu64 , temp2 );
-    } 
-    // else {
-    //   carryOut = sub_underflow(temp1, temp2, carryIn);
-    //   tempData[i] = temp1 - carryIn - temp2;
-    //   carryIn = carryOut;  
-    //    printf(" - " "%" PRIu64 , temp2 );
-    // }
+    } else {
+      carryOut = sub_underflow(temp1, temp2, carryIn);
+      tempData[i] = temp1 - carryIn - temp2;
+      carryIn = carryOut;  
+       printf(" - " "%" PRIu64 , temp2 );
+    }
     printf(" = " "%" PRIu64 "\n",tempData[i] ); 
   }
 
   if (carryIn > 0) {
-    ap->len = i + 1;
-  } else {
-    ap->len = i;
+    tempData[i++] = carryIn;
   }
 
-  ap->data = (uint64_t*)malloc(sizeof(uint64_t) * ap->len);
-  //printf("Final length: %d\n", i);
-
-  //if(carry > 0)
+  ap->len = i;
+  ap->data = (uint64_t*)malloc(sizeof(uint64_t) * i);
+  printf("Final length: %d\n", i);
 
   for (int j = 0; j < (int)ap->len; j++) {
-    ap->data[j] = tempData[j];
-  }
-
-  if(carryIn > 0) {
-    ap->data[i] = carryIn;
+    ap->data[j] = (tempData[j]);
   }
   
   free(tempData);
   return ap;
 }
+
 
 // int sub_borrow(uint64_t* temp1, uint64_t* temp2, int n) {
 //   if(n == strlen(temp1)) {
@@ -383,14 +376,14 @@ ApInt* unsigned_add(const ApInt* a, const ApInt* b, char c) {
 //   return 1;
 // }
 
-// int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
-//   if(temp1 < temp2 + carry) {
-//     printf("\nOverflow\n");
-//     return 1;
-//   } else {
-//     return 0;
-//   }
-// }
+int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
+  if(temp1 < temp2 + carry) {
+    printf("\nOverflow\n");
+    return 1;
+  } else {
+    return 0;
+  }
+}
 
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
