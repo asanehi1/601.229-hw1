@@ -132,6 +132,8 @@ void testHighestBitSet(TestObjs *objs) {
 }
 
 void testCompare(TestObjs *objs) {
+  ApInt *sum;
+  ApInt *ap;
 	/* 1 > 0 */
 	ASSERT(apint_compare(objs->ap1, objs->ap0) > 0);
 	/* 0 < 1 */
