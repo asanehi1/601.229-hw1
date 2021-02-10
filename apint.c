@@ -28,18 +28,20 @@ ApInt *apint_create_from_u64(uint64_t val) {
 }
 
 ApInt *apint_create_from_hex(const char *hex) {
-
+  printf("\n");
+  
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
-
   int counter = 0;
+  
   if(hex[0] == '-') {
     newApInt->flags = 1;
-    //printf("this is neg \n");
     counter++;
+    // if neg
   } else {
     newApInt->flags = 0;
   }
 
+  // if only neg such as hex = '-' 
   if (hex[0] == '-' && strlen(hex) == 1) {
     newApInt->data = (uint64_t*) malloc(sizeof(uint64_t));
     newApInt->data[0] = 0;
@@ -51,61 +53,51 @@ ApInt *apint_create_from_hex(const char *hex) {
     // help count leading zeros
       counter++;
   }
+
   if (counter == (int) strlen(hex)) {
-    // if its just 0
-    counter--;
-    newApInt->flags = 0;
-  }
-  //printf("%d \n", counter);
+      //if all zeros (so 00000000 turns into 0)
+      counter--;
+      newApInt->flags = 0;
+    }
 
-  int extra = 0;
-  if ((strlen(hex) - counter) % 16 != 0) {
-    extra = 1;
-  }
-  int n = (strlen(hex) - counter) / 16 + extra;
-  //printf("length: %d \n", n);
+  // make new hex without leading zeros and '-'
+  char *newHex = (char*) calloc(strlen(hex) - counter,  sizeof(char) + 1);
+  strncpy(newHex, hex + counter, strlen(hex) - counter);
+  
 
+  int is_remainder = 0;
+  if (strlen(newHex) % 16 != 0) {
+    is_remainder = 1;
+  }
+  int n = strlen(newHex) / 16 + is_remainder;
+  // n is ap->len value
+  
    newApInt->data = (uint64_t*) malloc(n * sizeof(uint64_t));
    newApInt->len = n;
 
-   int num = strlen(hex) - counter;
+   int digitsFromLeft = 0;
+   int digitLeft = strlen(newHex);
+   if (n > 1) {
+     digitsFromLeft = strlen(newHex) - 16;
+     digitLeft = 16;
+   }
 
-  int digitLeft = 16;
-  //printf("num: %d \n ", num);
-  int countDigits;
-  if (n > 1) {
-    countDigits = 16;
-  } else {
-    countDigits = num % 16;
-  }
-  int digitsFromLeft = num - countDigits + counter;
-
-  //char *tempH = (char *) calloc(1, sizeof(hex));
-  //tempH = swap_hex_values(hex);
-  for (int i = 0; i < n; i++) {
-    char * temp = (char*) calloc(17,  sizeof(char));
- 
-    if (i == n - 1) {
-      digitsFromLeft = counter % 17;
-      digitLeft =  num % 16 + 16 * (1- 1 * extra);
-      //digitLeft = num % 16 - counter ;
-      //digitLeft = (strlen(hex)- counter) % 16;
-      //counter = strlen(hex) - digitLeft;
+    for (int i = 0; i < n; i++) {
+      // this happens when i = n - 1 usually
+      if (digitsFromLeft < 0) {
+	digitsFromLeft = 0;
+	digitLeft = strlen(newHex) % 16;
+      }
+      
+      char * temp = (char*) calloc(17,  sizeof(char));
+      strncpy(temp, newHex + digitsFromLeft, digitLeft);
+      // strtoull changes hex into uint
+      newApInt->data[i] = (strtoull(temp, NULL,  16));
+      digitsFromLeft -=16;
+      free(temp);
     }
-    strncpy(temp, hex + digitsFromLeft, digitLeft);
-    //printf("digitsFromLeft %d \n", digitsFromLeft);
-    //printf("digitLeft %d \n", digitLeft);
-    //printf("string: %s \n", hex);
-    //printf("hi: %s \n", temp);
-    newApInt->data[i] = (strtoull(temp, NULL,  16));
-    //counter += 16;
-    digitsFromLeft -= 16;
-    free(temp);
-  }
     
-
-  //printf("\n");
-  //printf("final  %" PRIu64 "\n", (newApInt->data[0]));
+  free(newHex);
   return newApInt;
 }
 
@@ -142,17 +134,14 @@ int apint_is_negative(const ApInt *ap) {
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
   uint64_t temp = (ap->data[n]);
-  //printf("value: %" PRIu64, temp);
-  //uint64_t temp = (ap->data[n]);
   return  temp;
 }
 
 /* return which digit has highest bit */
 int apint_highest_bit_set(const ApInt *ap) {
   int n = (int) ap->len - 1;
-  // I think largest value is stored in data[0]
+  // smallest  value is stored in data[0]
   uint64_t temp = (ap->data[n]);
-  //uint64_t temp = (ap->data[0]);
   if (temp == (uint64_t) 0 && n == 0) {
     return -1;
   }
@@ -195,20 +184,16 @@ char get_hex_char(int num) {
 }
 
 char * swap_hex_values(char *hex) {
-  //printf("before swap: %s\n", hex);
   int end = strlen(hex) - 1;
   int start = 0;
   if (hex[0] == '-') {
     start = 1;
-    //printf("neg");
   }
   while (start < end) {
     char temp = hex[start];
     hex[start++] = hex[end];
     hex[end--] = temp;
   }
-
-  //printf("swapped: %s\n", hex);
 
   return hex;
 }
@@ -237,53 +222,35 @@ char *apint_format_as_hex(const ApInt *ap) {
   int counter = 0;
   int remainder = 0;
 
-  printf("\nIn hex function\n");
-  //print_binary(ap);
-
   if (ap->flags == 1) {
     hex[0] = '-';
     counter++;
   }
-   printf("len : %d \n", ap->len);
    
    for (int i = 0; i < (int) ap->len; i++) {
-     //printf("%d\n", i);
+
     uint64_t temp  = (ap->data[i]);
     remainder = 0;
-    // printf("\nin format function: ");
-    //printf("\nbefore hex %" PRIu64 "\n", temp);
-    //print_binary(temp); 
-    int bool = 1;
-    if (temp == (uint64_t) 0 && i < (int) ap->len -1) {
-      bool = 0;
-      temp = 16;
-      printf("bool is trueee \n");
-    }
+    int countForPadding = 0;
 
     do {
-      if (bool == 0) {
-	temp--;
-      } else {
-	// regular code
         remainder = temp % 16;
 	//remainder = temp & 15;
-	//printf("rem: %d\n", remainder);
 	temp /= 16;
-	
+	countForPadding++;	
 	//temp >>= 4;
-      }
-      if (counter == 123 || counter == 124 || counter == 125 || counter == 126) {
-	printf("re: %d, temp: %ld \n", remainder, temp);
-      }
       hex[counter++] =  get_hex_char(remainder);
-      printf("#: %d, hex: %c \n", counter - 1, hex[counter - 1]);
-    } while ((int) temp != 0);
-    //free(temp);
+    } while ((int) temp != 0);  
+    
+    while (countForPadding < 16 && i != (int) ap->len - 1) {
+      hex[counter++] = '0';
+      countForPadding++;
+    }
+   
   }
   
   
   hex = swap_hex_values(hex);
-  printf("hex: %s\n", hex);
 
   return hex;
 }
@@ -292,7 +259,7 @@ ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
   newApInt->data = (uint64_t*)malloc((int) ap->len * sizeof(uint64_t));
-  for (int i = 0; i < ap->len; i++) {
+  for (int i = 0; i < (int) ap->len; i++) {
     newApInt->data[i] = ap->data[i];
   }
 

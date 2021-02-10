@@ -262,8 +262,8 @@ void testFormatAsHex(TestObjs *objs) {
 	free(s);
 	
 
-	ap = apint_create_from_hex("2734E16F26EEFD72103DE3C6C0036A66998E72FC6116AF0775279240B3C4BEC7B768E855B317C748384219F05FB70AE1B13C960F117C00A1DD1ED77AD9DC1988677F658975F576507C57B6DA57C686B1D34DB524E621FDEEF71CEA1B5479B2CBF24EA39797433D57A8862B41F4B1");
-	ASSERT(0 == strcmp("2734e16f26eefd72103de3c6c0036a66998e72fc6116af0775279240b3c4bec7b768e855b317c748384219f05fb70ae1b13c960f117c00a1dd1ed77ad9dc1988677f658975f576507c57b6da57c686b1d34db524e621fdeef71cea1b5479b2cbf24ea39797433d57a8862b41f4b1", (s = apint_format_as_hex(ap))));
+	ap = apint_create_from_hex("f000000000000000f");
+	ASSERT(0 == strcmp("f000000000000000f", (s = apint_format_as_hex(ap))));
 	apint_destroy(ap);
 	free(s);
 
@@ -272,15 +272,45 @@ void testFormatAsHex(TestObjs *objs) {
 	apint_destroy(ap);
 	free(s);
 
-	/**
+	ap = apint_create_from_hex("2734e16f26eefd72103de3c6c0036a66998e72fc6116af0775279240b3c4bec7b768e855b317c748384219f05fb70ae1b13c960f117c00a1dd1ed77ad9dc1988677f658975f576507c57b6da57c686b1d34db524e621fdeef71cea1b5479b2cbf24ea39797433d57a8862b41f4b1");
+	ASSERT(0 == strcmp("2734e16f26eefd72103de3c6c0036a66998e72fc6116af0775279240b3c4bec7b768e855b317c748384219f05fb70ae1b13c960f117c00a1dd1ed77ad9dc1988677f658975f576507c57b6da57c686b1d34db524e621fdeef71cea1b5479b2cbf24ea39797433d57a8862b41f4b1", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
+
 	ap = apint_create_from_hex("-2734e16f26eefd72103de3c6c0036a66998e72fc6116af0775279240b3c4bec7b768e855b317c748384219f05fb70ae1b13c960f117c00a1dd1ed77ad9dc1988677f658975f576507c57b6da57c686b1d34db524e621fdeef71cea1b5479b2cbf24ea39797433d57a8862b41f4b1");
 	ASSERT(0 == strcmp("-2734e16f26eefd72103de3c6c0036a66998e72fc6116af0775279240b3c4bec7b768e855b317c748384219f05fb70ae1b13c960f117c00a1dd1ed77ad9dc1988677f658975f576507c57b6da57c686b1d34db524e621fdeef71cea1b5479b2cbf24ea39797433d57a8862b41f4b1", (s = apint_format_as_hex(ap))));
 	apint_destroy(ap);
 	free(s);
-	**/
 
+	ap = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
 
+	ap = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
 
+	ap = apint_create_from_hex("49265742CB3BD3BD5B070E3DD8607F7DD3062EC589EB7F501B8CD526FEAC23E01F0C967D656E4A8DE");
+	ASSERT(0 == strcmp("49265742cb3bd3bd5b070e3dd8607f7dd3062ec589eb7f501b8cd526feac23e01f0c967d656e4a8de", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
+
+	ap = apint_create_from_hex("583B57AE9ED6E3947C3381F506D5459404901477738AF0000000000000000");
+	ASSERT(0 == strcmp("583b57ae9ed6e3947c3381f506d5459404901477738af0000000000000000", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
+
+	 ap = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
+
+	 ap = apint_create_from_hex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", (s = apint_format_as_hex(ap))));
+	apint_destroy(ap);
+	free(s);
 	
 }
 
@@ -618,7 +648,7 @@ void testCreateFromHex (TestObjs *objs) {
         apint_destroy(ap);
 
 
-	ap = apint_create_from_hex("-00000000000ef2345abde789878");
+	ap = apint_create_from_hex("-000000000000000000000000000000000000000000000000000000000000000000ef2345abde789878");
 	//17231693203723819128 =  ef2345abde789878 hex
 	ASSERT(17231693203723819128 == (ap->data[0]));
 	apint_destroy(ap);
@@ -627,7 +657,7 @@ void testCreateFromHex (TestObjs *objs) {
 	ASSERT(110660361UL == apint_get_bits(ap, 0));
 	ASSERT(ap->flags == 1);
         apint_destroy(ap);
-	
+
 	ap = apint_negate(objs->large);
 	ASSERT(ap->flags == 1);
 	ASSERT(0000000000000000 == ap->data[0]);
