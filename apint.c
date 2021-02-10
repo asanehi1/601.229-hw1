@@ -18,6 +18,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+
+/** Returns a pointer to an ApInt instance whose value is specified by the val parameter, which is a 64-bit unsigned value **/ 
 ApInt *apint_create_from_u64(uint64_t val) {
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = 1;
@@ -27,6 +29,7 @@ ApInt *apint_create_from_u64(uint64_t val) {
   return newApInt;
 }
 
+/** Returns a pointer to an ApInt instance whose value is specified by the hex parameter, which is an arbitrary sequence of hexadecimal (base 16) digits. **/
 ApInt *apint_create_from_hex(const char *hex) {
   ApInt * newApInt = (ApInt*)malloc(sizeof(ApInt));
   int counter = 0;
@@ -127,6 +130,7 @@ int apint_is_negative(const ApInt *ap) {
   return 0;
 }
 
+/** return uint64_t values at that n **/
 uint64_t apint_get_bits(const ApInt *ap, unsigned n) {
   // ignore sign
   uint64_t temp = (ap->data[n]);
@@ -178,6 +182,7 @@ char get_hex_char(int num) {
   }
 }
 
+/** swap hex values **/
 char * swap_hex_values(char *hex) {
   int end = strlen(hex) - 1;
   int start = 0;
@@ -193,6 +198,7 @@ char * swap_hex_values(char *hex) {
   return hex;
 }
 
+/**  Returns a pointer to a dynamically-allocated C character string containing the hexadecimal (base 16) digits of the representation of the ApInt instance pointed to by ap **/
 char *apint_format_as_hex(const ApInt *ap) {
   char* hex = (char*) calloc((int) ap->len,  sizeof(char) * 17 + 1);
   int counter = 0;
@@ -225,7 +231,7 @@ char *apint_format_as_hex(const ApInt *ap) {
   hex = swap_hex_values(hex);
   return hex;
 }
-
+/** Returns a new ApInt instance with the opposite sign from the one passed as the parameter. As a special case, if the ApInt passed is numerically equal to zero, then an ApInt instance representing an identical (zero) value should be returned. **/
 ApInt *apint_negate(const ApInt *ap) {
   ApInt *newApInt = (ApInt*)malloc(sizeof(ApInt));
   newApInt->len = ap->len;
@@ -290,6 +296,7 @@ int get_length(const ApInt* a, const ApInt* b) {
   }
 }
 
+/** calculations for add / sub functions **/
 ApInt* unsigned_calc(const ApInt* a, const ApInt* b, char c) {
   int carryIn = 0, i = 0, carryOut = 0;
   int length = get_length(a,b);
@@ -350,6 +357,7 @@ int sub_underflow(uint64_t temp1, uint64_t temp2, int carry) {
   }
 }
 
+/** Computes the sum a plus b, and returns a pointer to an ApInt instance representing the sum. Note that either or both of the operand values could be negative **/
 ApInt *apint_add(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
   int len = get_length(a, b) - 1;
@@ -405,6 +413,7 @@ ApInt *apint_add(const ApInt *a, const ApInt *b) {
   return newApInt;
 }
 
+/** Computes the difference a minus b, and returns a pointer to an ApInt instance representing the difference. Note that either or both of the operand values could be negative **/
 ApInt *apint_sub(const ApInt *a, const ApInt *b) {
   ApInt * newApInt;
   ApInt * newB = apint_negate(b);
